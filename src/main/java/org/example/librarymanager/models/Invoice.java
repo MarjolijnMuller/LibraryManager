@@ -90,5 +90,4 @@ public class Invoice {
         this.fines = fines;
     }
     //TODO: factuur verwijderen
-    //TODO:
 }
