@@ -2,6 +2,7 @@ package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,14 +38,13 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<BookCopy> copies = new ArrayList<>();
 
-    public Book(String title, String authorFirstName, String authorLastName, String ISBN, String publisher, BookCategory category, List<BookCopy> copies) {
+    public Book(String title, String authorFirstName, String authorLastName, String ISBN, String publisher, BookCategory category) {
         this.title = title;
         this.authorFirstName = authorFirstName;
         this.authorLastName = authorLastName;
         this.ISBN = ISBN;
         this.publisher = publisher;
         this.category = category;
-        this.copies = copies;
     }
 
     public Book() {}
