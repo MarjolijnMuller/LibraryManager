@@ -16,5 +16,5 @@ public class BookInputDto {
     public String ISBN;
     public String publisher;
     @NotNull
-    public BookCategory category;
+    public String category;
 }

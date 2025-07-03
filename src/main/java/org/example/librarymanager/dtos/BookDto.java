@@ -10,6 +10,7 @@ public class BookDto {
     public String ISBN;
     public String publisher;
     public BookCategory category;
+    public int totalCopies;
 
     //TODO: eventueel numberOfCopies?
 }

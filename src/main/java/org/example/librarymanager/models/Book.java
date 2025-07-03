@@ -35,7 +35,7 @@ public class Book {
     @Column(nullable = false)
     private BookCategory category;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BookCopy> copies = new ArrayList<>();
 
     public Book(String title, String authorFirstName, String authorLastName, String ISBN, String publisher, BookCategory category) {
@@ -105,7 +105,21 @@ public class Book {
         return copies;
     }
 
-    public void setCopies(List<BookCopy> copies) {
-        this.copies = copies;
+    public void addCopy(BookCopy copy) {
+        if (copy != null) {
+            if (this.copies == null) {
+                this.copies = new ArrayList<>();
+            }
+            this.copies.add(copy);
+            copy.setBook(this); // Stel de relatie aan de andere kant in
+        }
     }
+
+    public void removeCopy(BookCopy copy) {
+        if (copy != null && this.copies != null) {
+            this.copies.remove(copy);
+            copy.setBook(null); // Verwijder de relatie aan de andere kant
+        }
+    }
+
 }

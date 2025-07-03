@@ -11,16 +11,14 @@ public class BookCopy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long bookCopiesId;
 
-    @NotNull
-    @Column(unique = true, nullable = false)
     private Long followNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookCopyStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "book_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_id", nullable = false)
     Book book;
 
     public BookCopy(Long followNumber, BookCopyStatus status, Book book) {
@@ -36,11 +34,11 @@ public class BookCopy {
         return bookCopiesId;
     }
 
-    public @NotNull Long getFollowNumber() {
+    public Long getFollowNumber() {
         return followNumber;
     }
 
-    public void setFollowNumber(@NotNull Long followNumber) {
+    public void setFollowNumber(Long followNumber) {
         this.followNumber = followNumber;
     }
 
@@ -57,6 +55,12 @@ public class BookCopy {
     }
 
     public void setBook(Book book) {
+        if (this.book != null && !this.book.equals(book)) {
+            this.book.getCopies().remove(this);
+        }
         this.book = book;
+        if (book != null && !book.getCopies().contains(this)) {
+            book.getCopies().add(this);
+        }
     }
 }
