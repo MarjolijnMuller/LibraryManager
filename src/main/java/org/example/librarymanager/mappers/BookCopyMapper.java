@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class BookCopyMapper {
 
-    public static BookCopyDto toDto(BookCopy bookCopy) {
+    public static BookCopyDto toResponseDto(BookCopy bookCopy) {
         if (bookCopy == null) {
             return null;
         }
@@ -35,7 +35,7 @@ public class BookCopyMapper {
             return java.util.Collections.emptyList();
         }
         return bookCopies.stream()
-                .map(BookCopyMapper::toDto)
+                .map(BookCopyMapper::toResponseDto)
                 .collect(Collectors.toList());
     }
 

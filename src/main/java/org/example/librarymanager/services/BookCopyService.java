@@ -78,7 +78,7 @@ public class BookCopyService {
         book.getCopies().add(newCopy);
         BookCopy savedCopy = this.bookCopyRepository.save(newCopy);
 
-        return BookCopyMapper.toDto(savedCopy);
+        return BookCopyMapper.toResponseDto(savedCopy);
     }
 
     public List<BookCopyDto> getAllBookCopiesForBook(Long bookId) {
@@ -88,9 +88,35 @@ public class BookCopyService {
         return BookCopyMapper.toDtoList(copies);
     }
 
+    public BookCopyDto getBookCopyByBookIdAndFollowNumber(Long bookId, Long followNumber) {
+        BookCopy bookCopy = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber).orElseThrow(() -> new IllegalArgumentException("Boekenexemplaar niet gevonden voor boek ID: " + bookId + " en volgnummer: " + followNumber));
+        return BookCopyMapper.toResponseDto(bookCopy);
+    }
+
     public List<BookCopyDto> getAllBookCopiesByStatus(BookCopyStatus status) {
         List<BookCopy> copies = bookCopyRepository.findBookCopiesByStatus(status);
         return BookCopyMapper.toDtoList(copies);
     }
 
+    public BookCopy updateBookCopy(Long bookId, Long followNumber, BookCopyInputDto bookCopyInputDto) {
+        BookCopy existingBookCopy = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber)
+                .orElseThrow(() -> new IllegalArgumentException("Boekenexemplaar niet gevonden voor boek ID: " + bookId + " en volgnummer: " + followNumber));
+        if (bookCopyInputDto.status != null) {
+            existingBookCopy.setStatus(bookCopyInputDto.status);
+        } else {
+            throw new IllegalArgumentException("Status is verplicht voor een volledige update (PUT) van een boekenexemplaar.");
+        }
+        return bookCopyRepository.save(existingBookCopy);
+    }
+
+    public void deleteBookCopy(Long bookId, Long followNumber) {
+        Optional<BookCopy> bookCopyOptional = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber);
+
+        if (bookCopyOptional.isPresent()) {
+            BookCopy bookCopyToDelete = bookCopyOptional.get();
+            bookCopyRepository.delete(bookCopyToDelete);
+        } else {
+            throw new IllegalArgumentException("Boekenexemplaar niet gevonden voor boek ID: " + bookId + " en volgnummer: " + followNumber);
+        }
+    }
 }

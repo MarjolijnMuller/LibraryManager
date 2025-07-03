@@ -3,6 +3,7 @@ package org.example.librarymanager.controllers;
 import jakarta.validation.Valid;
 import org.example.librarymanager.dtos.BookCopyDto;
 import org.example.librarymanager.dtos.BookCopyInputDto;
+import org.example.librarymanager.mappers.BookCopyMapper;
 import org.example.librarymanager.models.BookCopy;
 import org.example.librarymanager.services.BookCopyService;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,12 @@ public class BookCreationAndCopyController {
         return ResponseEntity.ok(copies);
     }
 
+    @GetMapping("/{bookId}/copies/{followNumber}")
+    public ResponseEntity<BookCopyDto> getBookCopyByBookIdAndFollowNumber(@PathVariable Long bookId, @PathVariable Long followNumber) {
+        BookCopyDto copy = bookCopyService.getBookCopyByBookIdAndFollowNumber(bookId, followNumber);
+        return ResponseEntity.ok(copy);
+    }
+
     @GetMapping("/status/{status}")
     public ResponseEntity<List<BookCopyDto>> getBookCopiesByStatus(@PathVariable String status) {
         try {
@@ -49,5 +56,21 @@ public class BookCreationAndCopyController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @PutMapping("/{bookId}/copies/{followNumber}")
+    public ResponseEntity<BookCopyDto> updateBookCopy(
+            @PathVariable Long bookId,
+            @PathVariable Long followNumber,
+            @RequestBody BookCopyInputDto bookCopyInputDto) {
+        BookCopy updatedBookCopy = bookCopyService.updateBookCopy(bookId, followNumber, bookCopyInputDto);
+        return ResponseEntity.ok(BookCopyMapper.toResponseDto(updatedBookCopy));
+    }
+
+
+    @DeleteMapping("/{bookId}/copies/{followNumber}")
+    public ResponseEntity<Void> deleteBookCopy(@PathVariable Long bookId, @PathVariable Long followNumber) {
+        bookCopyService.deleteBookCopy(bookId, followNumber);
+        return ResponseEntity.noContent().build();
     }
 }

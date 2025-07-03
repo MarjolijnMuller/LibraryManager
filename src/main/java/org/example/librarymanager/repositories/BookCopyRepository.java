@@ -18,4 +18,6 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
     List<BookCopy> findBookCopiesByStatus(BookCopyStatus status);
 
     List<BookCopy> findBookCopiesByBook(Book book);
+
+    Optional<BookCopy> findByBook_BookIdAndFollowNumber(Long bookId, Long followNumber);
 }

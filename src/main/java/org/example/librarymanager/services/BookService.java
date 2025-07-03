@@ -27,13 +27,9 @@ public class BookService {
     }
 
     public Book getBookById(long id) {
-        return bookRepository.findBookWithCopiesById(id) // Gebruik de methode die kopieën fetcht
+        return bookRepository.findBookWithCopiesById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
     }
-
-    /*public Book getBookById(Long bookId) {
-        return this.bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFountException("Boek niet gevonden met ID: " + bookId));
-    }*/
 
     public List<Book> getBooksByTitle(String title) {
         return this.bookRepository.findBookByTitle(title);

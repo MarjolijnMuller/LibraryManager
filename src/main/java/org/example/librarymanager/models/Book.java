@@ -35,7 +35,7 @@ public class Book {
     @Column(nullable = false)
     private BookCategory category;
 
-    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BookCopy> copies = new ArrayList<>();
 
     public Book(String title, String authorFirstName, String authorLastName, String ISBN, String publisher, BookCategory category) {
