@@ -35,19 +35,13 @@ public class BookCreationAndCopyController {
         return ResponseEntity.created(uri).body(createdCopyDto);
     }
 
-    @GetMapping("/copies/{id}")
-    public ResponseEntity<BookCopyDto> getBookCopyById(@PathVariable Long id) {
-        BookCopyDto bookCopyDto = bookCopyService.getBookCopyById(id);
-        return ResponseEntity.ok(bookCopyDto);
-    }
-
     @GetMapping("/{bookId}/copies")
     public ResponseEntity<List<BookCopyDto>> getAllCopiesForBook(@PathVariable Long bookId) {
         List<BookCopyDto> copies = bookCopyService.getAllBookCopiesForBook(bookId);
         return ResponseEntity.ok(copies);
     }
 
-    @GetMapping("/copies/status/{status}")
+    @GetMapping("/status/{status}")
     public ResponseEntity<List<BookCopyDto>> getBookCopiesByStatus(@PathVariable String status) {
         try {
             List<BookCopyDto> copies = bookCopyService.getAllBookCopiesByStatus(org.example.librarymanager.models.BookCopyStatus.valueOf(status.toUpperCase()));

@@ -93,9 +93,4 @@ public class BookCopyService {
         return BookCopyMapper.toDtoList(copies);
     }
 
-    public BookCopyDto getBookCopyById(Long copyId) {
-        BookCopy bookCopy = bookCopyRepository.findById(copyId)
-                .orElseThrow(() -> new IllegalArgumentException("BookCopy niet gevonden met ID: " + copyId));
-        return BookCopyMapper.toDto(bookCopy);
-    }
 }
