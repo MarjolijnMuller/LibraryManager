@@ -23,20 +23,6 @@ public class BookController {
         this.bookService = bookService;
     }
 
-    @PostMapping
-    public ResponseEntity<BookDto> createBook(@Valid @RequestBody BookInputDto bookInputDto) {
-        Book book = this.bookService.createBook(bookInputDto);
-        BookDto bookDto = BookMapper.toResponseDto(book);
-
-        URI uri = URI.create(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/" + bookDto.bookId).toUriString()
-        );
-
-        return ResponseEntity.created(uri).body(bookDto);
-    }
-
 
     @GetMapping // Mapt HTTP GET-verzoeken naar /books
     public ResponseEntity<List<BookDto>> getAllBooks() {

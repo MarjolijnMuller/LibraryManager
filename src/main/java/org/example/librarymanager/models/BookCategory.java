@@ -6,5 +6,6 @@ public enum BookCategory {
     CHILDRENS_BOOK,
     ADULTS_BOOK,
     SCIENCE,
-    HISTORY
+    HISTORY;
+
 }

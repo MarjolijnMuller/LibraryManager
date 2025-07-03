@@ -5,6 +5,7 @@ import org.example.librarymanager.exceptions.ResourceNotFountException;
 import org.example.librarymanager.mappers.BookMapper;
 import org.example.librarymanager.models.Book;
 import org.example.librarymanager.models.BookCategory;
+import org.example.librarymanager.repositories.BookCopyRepository;
 import org.example.librarymanager.repositories.BookRepository;
 
 import org.springframework.stereotype.Service;
@@ -14,23 +15,25 @@ import java.util.List;
 @Service
 public class BookService {
     private final BookRepository bookRepository;
+    private final BookCopyRepository bookCopyRepository;
 
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, BookCopyRepository bookCopyRepository) {
         this.bookRepository = bookRepository;
-    }
-
-    public Book createBook(BookInputDto bookInputDto) {
-        Book book = BookMapper.toEntity(bookInputDto);
-        return this.bookRepository.save(book);
+        this.bookCopyRepository = bookCopyRepository;
     }
 
     public List<Book> getAllBooks() {
-        return this.bookRepository.findAll();
+        return bookRepository.findAllWithCopies();
     }
 
-    public Book getBookById(Long bookId) {
-        return this.bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFountException("Boek niet gevonden met ID: " + bookId));
+    public Book getBookById(long id) {
+        return bookRepository.findBookWithCopiesById(id) // Gebruik de methode die kopieën fetcht
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
     }
+
+    /*public Book getBookById(Long bookId) {
+        return this.bookRepository.findById(bookId).orElseThrow(() -> new ResourceNotFountException("Boek niet gevonden met ID: " + bookId));
+    }*/
 
     public List<Book> getBooksByTitle(String title) {
         return this.bookRepository.findBookByTitle(title);
@@ -58,7 +61,16 @@ public class BookService {
         existingBook.setAuthorLastName(bookInputDto.authorLastName);
         existingBook.setISBN(bookInputDto.ISBN);
         existingBook.setPublisher(bookInputDto.publisher);
-        existingBook.setCategory(bookInputDto.category);
+
+        if (bookInputDto.category != null && !bookInputDto.category.trim().isEmpty()) {
+            try {
+                existingBook.setCategory(BookCategory.valueOf(bookInputDto.category.trim().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid category value: " + bookInputDto.category, e);
+            }
+        } else {
+            existingBook.setCategory(null);
+        }
 
         return bookRepository.save(existingBook);
     }
@@ -80,7 +92,11 @@ public class BookService {
             existingBook.setPublisher(updates.publisher);
         }
         if (updates.category != null) {
-            existingBook.setCategory(updates.category);
+            try {
+                existingBook.setCategory(BookCategory.valueOf(updates.category.trim().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid category value for patch: " + updates.category, e);
+            }
         }
 
         return bookRepository.save(existingBook);
