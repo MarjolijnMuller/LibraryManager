@@ -1,6 +1,7 @@
 package org.example.librarymanager.dtos;
 
-public class MemberDto {
+public class MemberDto extends UserDto {
+    public Long memberId;
     public String firstName;
     public String lastName;
     public String street;

@@ -7,11 +7,11 @@ import jakarta.validation.constraints.Size;
 public class UserInputDto {
     @NotNull
     @Size(min = 5, max = 50)
-    private String username;
+    public String username;
 
     @NotNull
     @Size(min = 5, max = 50)
-    private String password;
+    public String password;
 
-    private String profilePictureUrl;
+    public String profilePictureUrl;
 }

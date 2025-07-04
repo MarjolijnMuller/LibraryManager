@@ -6,30 +6,30 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public class MemberInputDto {
+public class MemberInputDto extends UserInputDto {
     @NotNull
     @Size(min = 3, max = 250)
-    private String firstName;
+    public String firstName;
     @NotNull
     @Size(min = 3, max = 250)
-    private String lastName;
+    public String lastName;
 
     @NotNull
     @Size(min = 1, max = 250)
-    private String street;
+    public String street;
     @NotNull
     @Size(min=1)
     @Positive
-    private String houseNumber;
+    public String houseNumber;
     @NotNull
     @Size(min = 3, max = 100)
-    private String postalCode;
+    public String postalCode;
     @NotNull
     @Size(min = 1, max = 100)
-    private String city;
+    public String city;
 
     @Email
     @Size(min = 3, max = 250)
-    private String email;
-    private String phone;
+    public String email;
+    public String phone;
 }
