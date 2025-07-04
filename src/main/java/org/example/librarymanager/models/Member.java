@@ -3,6 +3,8 @@ package org.example.librarymanager.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table (name = "members")
@@ -14,22 +16,28 @@ public class Member extends User{
 
     @NotNull
     @Column(nullable = false)
+    @Size(min = 3, max = 250)
     private String firstName;
     @NotNull
     @Column(nullable = false)
+    @Size(min = 3, max = 250)
     private String lastName;
 
     @NotNull
     @Column(nullable = false)
+    @Size(min = 1, max = 250)
     private String street;
     @NotNull
     @Column(nullable = false)
+    @Positive
     private String houseNumber;
     @NotNull
     @Column(nullable = false)
+    @Size(min = 3, max = 100)
     private String postalCode;
     @NotNull
     @Column(nullable = false)
+    @Size(min = 1, max = 100)
     private String city;
 
     @Email

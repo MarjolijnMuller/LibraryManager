@@ -2,6 +2,7 @@ package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -15,10 +16,12 @@ public abstract class User {
 
     @NotNull
     @Column(unique = true, nullable = false)
+    @Size(min = 5, max = 50)
     private String username;
 
     @NotNull
     @Column(nullable = false)
+    @Size(min = 5, max = 50)
     private String password;
 
     private String profilePictureUrl;
