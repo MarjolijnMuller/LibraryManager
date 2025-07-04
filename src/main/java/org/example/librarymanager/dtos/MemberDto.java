@@ -8,6 +8,6 @@ public class MemberDto extends UserDto {
     public String houseNumber;
     public String postalCode;
     public String city;
-    public String email;
+
     public String phone;
 }

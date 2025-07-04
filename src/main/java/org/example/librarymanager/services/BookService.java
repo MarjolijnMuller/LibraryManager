@@ -28,7 +28,7 @@ public class BookService {
 
     public Book getBookById(long id) {
         return bookRepository.findBookWithCopiesById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + id));
     }
 
     public List<Book> getBooksByTitle(String title) {
@@ -41,7 +41,7 @@ public class BookService {
 
     public Book getBookByISBN(String isbn) {
         return this.bookRepository.findBookByISBN(isbn)
-                .orElseThrow(() -> new ResourceNotFountException("Boek niet gevonden met ISBN: " + isbn));
+                .orElseThrow(() -> new ResourceNotFountException("Book not found with ISBN: " + isbn));
     }
 
     public List<Book> getBooksByCategory(BookCategory category) {
@@ -50,7 +50,7 @@ public class BookService {
 
     public Book updateBook(Long bookId, BookInputDto bookInputDto) {
         Book existingBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResourceNotFountException("Boek niet gevonden met ID: " + bookId));
+                .orElseThrow(() -> new ResourceNotFountException("Book not found with ID: " + bookId));
 
         existingBook.setTitle(bookInputDto.title);
         existingBook.setAuthorFirstName(bookInputDto.authorFirstName);
@@ -73,7 +73,7 @@ public class BookService {
 
     public Book patchBook(Long bookId, BookInputDto updates) {
         Book existingBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResourceNotFountException("Boek niet gevonden met ID: " + bookId));
+                .orElseThrow(() -> new ResourceNotFountException("Book not found with ID: " + bookId));
 
         if (updates.title != null) {
             existingBook.setTitle(updates.title);

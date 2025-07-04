@@ -28,8 +28,5 @@ public class MemberInputDto extends UserInputDto {
     @Size(min = 1, max = 100)
     public String city;
 
-    @Email
-    @Size(min = 3, max = 250)
-    public String email;
     public String phone;
 }

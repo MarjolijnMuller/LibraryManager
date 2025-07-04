@@ -1,6 +1,7 @@
 package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -19,6 +20,9 @@ public abstract class User {
     @Size(min = 5, max = 50)
     private String username;
 
+    @Email
+    private String email;
+
     @NotNull
     @Column(nullable = false)
     @Size(min = 5, max = 50)
@@ -26,8 +30,9 @@ public abstract class User {
 
     private String profilePictureUrl;
 
-    public User(String username, String password, String profilePictureUrl) {
+    public User(String username, String email, String password, String profilePictureUrl) {
         this.username = username;
+        this.email = email;
         this.password = password;
         this.profilePictureUrl = profilePictureUrl;
     }
@@ -63,4 +68,12 @@ public abstract class User {
     }
 
     public abstract String getRole();
+
+    public @Email String getEmail() {
+        return email;
+    }
+
+    public void setEmail(@Email String email) {
+        this.email = email;
+    }
 }

@@ -40,12 +40,11 @@ public class Member extends User{
     @Size(min = 1, max = 100)
     private String city;
 
-    @Email
-    private String email;
+
     private String phone;
 
-    public Member(String username, String password, String profilePictureUrl, Long memberId, String firstName, String lastName, String street, String houseNumber, String postalCode, String city, String email, String phone) {
-        super(username, password, profilePictureUrl);
+    public Member(String username, String email, String password, String profilePictureUrl, Long memberId, String firstName, String lastName, String street, String houseNumber, String postalCode, String city,  String phone) {
+        super(username, email, password, profilePictureUrl);
         this.memberId = memberId;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -53,7 +52,7 @@ public class Member extends User{
         this.houseNumber = houseNumber;
         this.postalCode = postalCode;
         this.city = city;
-        this.email = email;
+
         this.phone = phone;
     }
 
@@ -119,14 +118,6 @@ public class Member extends User{
 
     public void setCity(@NotNull String city) {
         this.city = city;
-    }
-
-    public @Email String getEmail() {
-        return email;
-    }
-
-    public void setEmail(@Email String email) {
-        this.email = email;
     }
 
     public String getPhone() {
