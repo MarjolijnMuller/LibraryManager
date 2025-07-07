@@ -3,6 +3,7 @@ package org.example.librarymanager.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class Invoice {
     @Column(nullable = false)
     private LocalDate invoiceDate;
 
+    @Size(min=3, max=250)
     private String invoicePeriod;
 
     @NotNull
