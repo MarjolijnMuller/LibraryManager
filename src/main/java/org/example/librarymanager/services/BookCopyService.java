@@ -109,6 +109,8 @@ public class BookCopyService {
         return bookCopyRepository.save(existingBookCopy);
     }
 
+    //TODO: patch
+
     public void deleteBookCopy(Long bookId, Long followNumber) {
         Optional<BookCopy> bookCopyOptional = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber);
 

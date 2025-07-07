@@ -15,7 +15,7 @@ public class Invoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long InvoiceID;
+    private Long invoiceId;
 
     @NotNull
     @Column(nullable = false)
@@ -47,8 +47,8 @@ public class Invoice {
 
     public Invoice() {}
 
-    public Long getInvoiceID() {
-        return InvoiceID;
+    public Long getInvoiceId() {
+        return invoiceId;
     }
 
     public @NotNull LocalDate getInvoiceDate() {

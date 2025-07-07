@@ -13,18 +13,18 @@ import java.time.LocalDate;
 public class InvoiceInputDto {
     @NotNull
     @Column(nullable = false)
-    private LocalDate invoiceDate;
+    public LocalDate invoiceDate;
 
     @Size(min=3, max=250)
-    private String invoicePeriod;
+    public String invoicePeriod;
 
     @NotNull
     @PositiveOrZero
     @Column(nullable = false)
-    private Double invoiceAmount;
+    public Double invoiceAmount;
 
     @NotNull
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    public String paymentStatus;
 }

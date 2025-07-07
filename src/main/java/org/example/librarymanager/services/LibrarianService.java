@@ -27,7 +27,7 @@ public class LibrarianService {
     }
 
     public Librarian getLibrarianById(Long userId) {
-        return this.librarianRepository.findById(userId).orElseThrow(() -> new RuntimeException("Librarian not found with ID: " + userId));
+        return this.librarianRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Librarian not found with ID: " + userId));
     }
 
     public  List<Librarian> getLibrarianByFirstName(String firstName) {
