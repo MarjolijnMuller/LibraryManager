@@ -4,6 +4,7 @@ import org.example.librarymanager.dtos.BookDto;
 import org.example.librarymanager.dtos.BookInputDto;
 import org.example.librarymanager.models.Book;
 import org.example.librarymanager.models.BookCategory;
+import org.example.librarymanager.models.PaymentStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,17 +21,22 @@ public class BookMapper {
         book.setAuthorLastName(bookInputDto.authorLastName);
         book.setISBN(bookInputDto.ISBN);
         book.setPublisher(bookInputDto.publisher);
+
+
+        BookCategory defaultBookCategory = BookCategory.ADULTS_BOOK;
+
         if (bookInputDto.category != null && !bookInputDto.category.trim().isEmpty()) {
+            defaultBookCategory = BookCategory.valueOf(bookInputDto.category.trim().toUpperCase());
+
             try {
                 book.setCategory(BookCategory.valueOf(bookInputDto.category.trim().toUpperCase()));
             } catch (IllegalArgumentException e) {
-                System.err.println("Invalid book category provided: '" + bookInputDto.category + "'. Setting category to null.");
-                book.setCategory(null);
+                System.err.println("Invalid book category provided: '" + bookInputDto.category + "'. Setting category to adults book.");
+                book.setCategory(defaultBookCategory);
             }
-        } else {
-
-            book.setCategory(null);
         }
+            book.setCategory(defaultBookCategory);
+
         return book;
     }
 

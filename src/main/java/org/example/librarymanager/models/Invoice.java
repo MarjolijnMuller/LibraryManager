@@ -3,6 +3,7 @@ package org.example.librarymanager.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,12 +15,13 @@ public class Invoice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long InvoiceID;
+    private Long invoiceId;
 
     @NotNull
     @Column(nullable = false)
     private LocalDate invoiceDate;
 
+    @Size(min=3, max=250)
     private String invoicePeriod;
 
     @NotNull
@@ -45,8 +47,8 @@ public class Invoice {
 
     public Invoice() {}
 
-    public Long getInvoiceID() {
-        return InvoiceID;
+    public Long getInvoiceId() {
+        return invoiceId;
     }
 
     public @NotNull LocalDate getInvoiceDate() {

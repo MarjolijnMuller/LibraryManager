@@ -31,7 +31,7 @@ public class BookController {
         return ResponseEntity.ok(allBooksDto);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{bookId}")
     public ResponseEntity<BookDto> getBookById(@PathVariable long bookId) {
         return ResponseEntity.ok(BookMapper.toResponseDto(bookService.getBookById(bookId)));
     }
@@ -65,23 +65,23 @@ public class BookController {
     }
 
 
-    @PutMapping("/{id}")
-    public ResponseEntity<BookDto> updateBook(@Valid @PathVariable long id, @RequestBody BookInputDto bookInputDto) {
-        Book book = this.bookService.updateBook(id, bookInputDto);
+    @PutMapping("/{bookId}")
+    public ResponseEntity<BookDto> updateBook(@Valid @PathVariable long bookId, @RequestBody BookInputDto bookInputDto) {
+        Book book = this.bookService.updateBook(bookId, bookInputDto);
         BookDto bookDto = BookMapper.toResponseDto(book);
         return ResponseEntity.ok(bookDto);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<BookDto> patchBook(@Valid @PathVariable long id, @RequestBody BookInputDto bookInputDto) {
-        Book book = this.bookService.patchBook(id, bookInputDto);
+    @PatchMapping("/{bookId}")
+    public ResponseEntity<BookDto> patchBook(@Valid @PathVariable long bookId, @RequestBody BookInputDto bookInputDto) {
+        Book book = this.bookService.patchBook(bookId, bookInputDto);
         BookDto bookDto = BookMapper.toResponseDto(book);
         return ResponseEntity.ok(bookDto);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<BookDto> deleteBook(@Valid @PathVariable long id) {
-        this.bookService.deleteBook(id);
+    @DeleteMapping("/{bookId}")
+    public ResponseEntity<BookDto> deleteBook(@Valid @PathVariable long bookId) {
+        this.bookService.deleteBook(bookId);
         return ResponseEntity.noContent().build();
     }
 

@@ -97,3 +97,11 @@ VALUES (201, 'Adam', 'Brown', 'Parklaan', '12', '1000AB', 'Amsterdam', '06112233
        (203, 'Michael', 'White', 'Nieuwstraat', '30', '3000EF', 'Rotterdam', '0633445566'),
        (204, 'Olivia', 'Green', 'Dorpsweg', '8', '4000GH', 'Den Haag', '0644556677'),
        (205, 'Peter', 'Black', 'Molenpad', '15B', '5000IJ', 'Eindhoven', '0655667788');
+
+INSERT INTO invoices (invoice_date, invoice_period, invoice_amount, payment_status)
+VALUES ('2024-01-15', 'Januari 2024', 25.50, 'PAID'),
+       ('2024-02-10', 'Februari 2024', 15.00, 'PENDING'),
+       ('2024-03-05', 'Maart 2024', 30.75, 'OVERDUE'),
+       ('2024-04-20', 'April 2024', 10.00, 'PAID'),
+       ('2024-05-25', 'Mei 2024', 45.99, 'PENDING'),
+       ('2024-06-12', 'Juni 2024', 5.25, 'OVERDUE');
