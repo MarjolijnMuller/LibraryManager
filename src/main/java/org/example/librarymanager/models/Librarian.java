@@ -10,9 +10,6 @@ import jakarta.validation.constraints.Size;
 
 public class Librarian extends User {
 
-    //TODO: automatisch laten ophogen
-    private Long librarianId;
-
     @NotNull
     @Column(nullable = false)
     @Size(min = 3, max = 250)
@@ -22,10 +19,6 @@ public class Librarian extends User {
     @Size(min = 3, max = 250)
     private String lastName;
 
-    public Librarian(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
 
     public Librarian() {
     }
@@ -33,15 +26,6 @@ public class Librarian extends User {
     @Override
     public String getRole() {
         return "Librarian";
-    }
-
-    public Long getLibrarianId() {
-        return librarianId;
-    }
-
-    //TODO: automatisch ophogen
-    public void setLibrarianId(Long librarianId) {
-        this.librarianId = librarianId;
     }
 
     public @NotNull String getFirstName() {

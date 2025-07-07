@@ -25,7 +25,7 @@ public abstract class User {
 
     @NotNull
     @Column(nullable = false)
-    @Size(min = 5, max = 50)
+    @Size(min = 5, max = 250)
     private String password;
 
     private String profilePictureUrl;

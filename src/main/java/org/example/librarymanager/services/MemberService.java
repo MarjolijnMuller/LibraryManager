@@ -26,37 +26,38 @@ public class MemberService {
         return this.memberRepository.findAll();
     }
 
-    public Member getMemberByMemberId(Long memberId) {
-        return this.memberRepository.findById(memberId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + memberId));
+    public Member getMemberById(Long userId) {
+        return this.memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + userId));
     }
 
     public List<Member> getMemberByFirstName(String firstName) {
-        return this.memberRepository.findByMemberFirstName(firstName);
+        return this.memberRepository.findByFirstName(firstName);
     }
 
     public List<Member> getMemberByLastName(String lastName) {
-        return this.memberRepository.findByMemberLastName(lastName);
+        return this.memberRepository.findByLastName(lastName);
     }
 
-    public Member getMemberByFirstNameAndLastName(String firstName, String lastName) {
-        return this.memberRepository.findByMemberFirstNameAndMemberLastName(firstName, lastName);
+    public List<Member> getMemberByFirstNameAndLastName(String firstName, String lastName) {
+        return this.memberRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 
     public List<Member> getMemberByEmail(String email) {
-        return this.memberRepository.findByMemberEmail(email);
+        return this.memberRepository.findByEmail(email);
     }
 
     public List<Member> getMemberByPostalCodeAndHouseNumber(String postalCode, String houseNumber) {
-        return this.memberRepository.findMemberByPostalCodeAndHouseNumber(postalCode, houseNumber);
+        return this.memberRepository.findByPostalCodeAndHouseNumber(postalCode, houseNumber);
     }
 
     public Member getMemberByUsername(String username) {
         return this.memberRepository.findByUsername(username);
     }
 
-    public Member updateMember(Long memberId, MemberInputDto memberInputDto) {
-        Member existingMember = memberRepository.findById(memberId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + memberId));
+    public Member updateMember(Long userId, MemberInputDto memberInputDto) {
+        Member existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + userId));
 
+        existingMember.setFirstName(memberInputDto.firstName);
         existingMember.setLastName(memberInputDto.lastName);
         existingMember.setStreet(memberInputDto.street);
         existingMember.setHouseNumber(memberInputDto.houseNumber);
@@ -82,8 +83,8 @@ public class MemberService {
         return this.memberRepository.save(existingMember);
     }
 
-    public Member patchMember(MemberInputDto memberInputDto, Long memberId) {
-        Member existingMember = memberRepository.findById(memberId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + memberId));
+    public Member patchMember(MemberInputDto memberInputDto, Long userId) {
+        Member existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + userId));
 
         if (memberInputDto.lastName != null) {
             existingMember.setLastName(memberInputDto.lastName);
@@ -119,7 +120,7 @@ public class MemberService {
         return this.memberRepository.save(existingMember);
     }
 
-    public void deleteMember(Long memberId) {
-        this.memberRepository.deleteById(memberId);
+    public void deleteMember(Long userId) {
+        this.memberRepository.deleteById(userId);
     }
 }

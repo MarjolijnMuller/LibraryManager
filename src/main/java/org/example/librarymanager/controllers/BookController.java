@@ -24,7 +24,7 @@ public class BookController {
     }
 
 
-    @GetMapping // Mapt HTTP GET-verzoeken naar /books
+    @GetMapping
     public ResponseEntity<List<BookDto>> getAllBooks() {
         List<Book> allBooks = bookService.getAllBooks();
         List<BookDto> allBooksDto = BookMapper.toResponseDtoList(allBooks);
@@ -32,8 +32,8 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BookDto> getBookById(@PathVariable long id) {
-        return ResponseEntity.ok(BookMapper.toResponseDto(bookService.getBookById(id)));
+    public ResponseEntity<BookDto> getBookById(@PathVariable long bookId) {
+        return ResponseEntity.ok(BookMapper.toResponseDto(bookService.getBookById(bookId)));
     }
 
     @GetMapping("/title/{title}")

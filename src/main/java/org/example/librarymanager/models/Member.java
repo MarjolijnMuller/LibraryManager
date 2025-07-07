@@ -11,8 +11,6 @@ import jakarta.validation.constraints.Size;
 @PrimaryKeyJoinColumn(name = "userId", referencedColumnName = "userId")
 
 public class Member extends User{
-    //TODO: automatisch laten ophogen
-    private Long memberId;
 
     @NotNull
     @Column(nullable = false)
@@ -29,7 +27,6 @@ public class Member extends User{
     private String street;
     @NotNull
     @Column(nullable = false)
-    @Positive
     private String houseNumber;
     @NotNull
     @Column(nullable = false)
@@ -43,33 +40,13 @@ public class Member extends User{
 
     private String phone;
 
-    public Member(String username, String email, String password, String profilePictureUrl, Long memberId, String firstName, String lastName, String street, String houseNumber, String postalCode, String city,  String phone) {
-        super(username, email, password, profilePictureUrl);
-        this.memberId = memberId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.street = street;
-        this.houseNumber = houseNumber;
-        this.postalCode = postalCode;
-        this.city = city;
 
-        this.phone = phone;
-    }
 
     public Member() {}
 
     @Override
     public String getRole() {
         return "Member";
-    }
-
-    public Long getMemberId() {
-        return memberId;
-    }
-
-    //TODO: automatisch ophogen
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
     }
 
     public @NotNull String getFirstName() {

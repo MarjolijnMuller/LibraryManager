@@ -1,6 +1,5 @@
 package org.example.librarymanager.services;
 
-import org.example.librarymanager.dtos.LibrarianDto;
 import org.example.librarymanager.dtos.LibrarianInputDto;
 import org.example.librarymanager.dtos.UserInputDto;
 import org.example.librarymanager.exceptions.ResourceNotFountException;
@@ -19,7 +18,7 @@ public class LibrarianService {
         this.librarianRepository = librarianRepository;
     }
 
-    public Librarian createPerson(LibrarianInputDto librarianInputDto, UserInputDto userInputDto) {
+    public Librarian createLibrarian(LibrarianInputDto librarianInputDto, UserInputDto userInputDto) {
         return this.librarianRepository.save(LibrarianMapper.toEntity(librarianInputDto, userInputDto));
     }
 
@@ -27,8 +26,8 @@ public class LibrarianService {
         return librarianRepository.findAll();
     }
 
-    public Librarian getLibrarianById(Long librarianId) {
-        return this.librarianRepository.findById(librarianId).orElseThrow(() -> new RuntimeException("Librarian not found with ID: " + librarianId));
+    public Librarian getLibrarianById(Long userId) {
+        return this.librarianRepository.findById(userId).orElseThrow(() -> new RuntimeException("Librarian not found with ID: " + userId));
     }
 
     public  List<Librarian> getLibrarianByFirstName(String firstName) {
@@ -39,7 +38,7 @@ public class LibrarianService {
         return this.librarianRepository.findByLastName(lastName);
     }
 
-    public Librarian getLibrarianByFirstNameAndLastName(String firstName, String lastName) {
+    public List<Librarian> getLibrarianByFirstNameAndLastName(String firstName, String lastName) {
         return this.librarianRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 
@@ -51,15 +50,16 @@ public class LibrarianService {
         return this.librarianRepository.findByEmail(email);
     }
 
-    public Librarian updateLibrarian(LibrarianInputDto librarianInputDto, Long librarianId) {
+    public Librarian updateLibrarian(LibrarianInputDto librarianInputDto, Long userId) {
 
-        Librarian existingLibrarian = librarianRepository.findById(librarianId)
-                .orElseThrow(() -> new ResourceNotFountException("Librarian not found with ID: " + librarianId));
+        Librarian existingLibrarian = librarianRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFountException("Librarian not found with ID: " + userId));
 
         if (librarianInputDto.profilePictureUrl != null) {
             existingLibrarian.setProfilePictureUrl(librarianInputDto.profilePictureUrl);
         }
 
+        existingLibrarian.setFirstName(librarianInputDto.firstName);
         existingLibrarian.setLastName(librarianInputDto.lastName);
         existingLibrarian.setUsername(librarianInputDto.username);
 
@@ -73,8 +73,8 @@ public class LibrarianService {
         return this.librarianRepository.save(existingLibrarian);
     }
 
-    public Librarian patchLibrarian(LibrarianInputDto updates, Long librarianId) {
-        Librarian existingLibrarian = librarianRepository.findById(librarianId).orElseThrow(() -> new ResourceNotFountException("Librarian not found with ID: " + librarianId));
+    public Librarian patchLibrarian(LibrarianInputDto updates, Long userId) {
+        Librarian existingLibrarian = librarianRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Librarian not found with ID: " + userId));
 
         if (updates.profilePictureUrl != null) {
             existingLibrarian.setProfilePictureUrl(updates.profilePictureUrl);
@@ -95,8 +95,8 @@ public class LibrarianService {
         return this.librarianRepository.save(existingLibrarian);
     }
 
-    public void deleteLibrarian(Long librarianId) {
-        librarianRepository.deleteById(librarianId);
+    public void deleteLibrarian(Long userId) {
+        librarianRepository.deleteById(userId);
     }
 
 }

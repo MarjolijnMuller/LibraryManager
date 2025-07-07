@@ -32,7 +32,7 @@ public class Loan {
         private BookCopy bookCopy;
 
     @ManyToOne
-    @JoinColumn(name="memberId")
+    @JoinColumn(name="userId")
     @NotNull
     private Member member;
 

@@ -19,7 +19,6 @@ public class MemberInputDto extends UserInputDto {
     public String street;
     @NotNull
     @Size(min=1)
-    @Positive
     public String houseNumber;
     @NotNull
     @Size(min = 3, max = 100)

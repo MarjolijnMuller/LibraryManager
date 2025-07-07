@@ -60,3 +60,40 @@ values (1, 1, 'AVAILABLE'),
        (5, 1, 'MISSING'),
        (6, 1, 'AVAILABLE'),
        (7, 1, 'IN_REPAIR');
+
+INSERT INTO users (user_id, username, email, password, profile_picture_url)
+VALUES (101, 'emilylib', 'emily.clark@example.com', '$2a$10$HASHED_PASSWORD_EMILY',
+        'http://example.com/images/emily.jpg'),
+       (102, 'davidlib', 'david.jones@example.com', '$2a$10$HASHED_PASSWORD_DAVID',
+        'http://example.com/images/david.jpg'),
+       (103, 'sarahlib', 'sarah.miller@example.com', '$2a$10$HASHED_PASSWORD_SARAH',
+        'http://example.com/images/sarah.jpg'),
+       (104, 'chrislib', 'chris.wilson@example.com', '$2a$10$HASHED_PASSWORD_CHRIS',
+        'http://example.com/images/chris.jpg'),
+       (105, 'lisalib', 'lisa.moore@example.com', '$2a$10$HASHED_PASSWORD_LISA', 'http://example.com/images/lisa.jpg');
+
+INSERT INTO librarians (user_id, first_name, last_name)
+VALUES (101, 'Emily', 'Clark'),
+       (102, 'David', 'Jones'),
+       (103, 'Sarah', 'Miller'),
+       (104, 'Chris', 'Wilson'),
+       (105, 'Lisa', 'Moore');
+
+INSERT INTO users (user_id, username, email, password, profile_picture_url)
+VALUES (201, 'adamember', 'adam.brown@example.com', '$2a$10$HASHED_PASSWORD_ADAM',
+        'http://example.com/images/adam.jpg'),
+       (202, 'ellenmember', 'ellen.davis@example.com', '$2a$10$HASHED_PASSWORD_ELLEN',
+        'http://example.com/images/ellen.jpg'),
+       (203, 'mikeymember', 'michael.white@example.com', '$2a$10$HASHED_PASSWORD_MIKEY',
+        'http://example.com/images/michael.jpg'),
+       (204, 'oliviarmember', 'olivia.green@example.com', '$2a$10$HASHED_PASSWORD_OLIVIA',
+        'http://example.com/images/olivia.jpg'),
+       (205, 'petermember', 'peter.black@example.com', '$2a$10$HASHED_PASSWORD_PETER',
+        'http://example.com/images/peter.jpg');
+
+INSERT INTO members (user_id, first_name, last_name, street, house_number, postal_code, city, phone)
+VALUES (201, 'Adam', 'Brown', 'Parklaan', '12', '1000AB', 'Amsterdam', '0611223344'),
+       (202, 'Ellen', 'Davis', 'Kerkstraat', '5A', '2000CD', 'Utrecht', '0622334455'),
+       (203, 'Michael', 'White', 'Nieuwstraat', '30', '3000EF', 'Rotterdam', '0633445566'),
+       (204, 'Olivia', 'Green', 'Dorpsweg', '8', '4000GH', 'Den Haag', '0644556677'),
+       (205, 'Peter', 'Black', 'Molenpad', '15B', '5000IJ', 'Eindhoven', '0655667788');

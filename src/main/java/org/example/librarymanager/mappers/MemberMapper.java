@@ -18,17 +18,29 @@ public class MemberMapper {
             member.setUsername(memberInputDto.username);
             member.setPassword(memberInputDto.password);
             member.setProfilePictureUrl(memberInputDto.profilePictureUrl);
+            member.setEmail(memberInputDto.email);
+            member.setPhone(memberInputDto.phone);
+            member.setCity(memberInputDto.city);
+            member.setPostalCode(memberInputDto.postalCode);
+            member.setStreet(memberInputDto.street);
+            member.setHouseNumber(memberInputDto.houseNumber);
             return member;
         }
 
         public static MemberDto toResponseDto(Member member){
             MemberDto memberDto = new MemberDto();
-            memberDto.memberId = member.getMemberId();
+            memberDto.userId = member.getUserId();
             memberDto.firstName = member.getFirstName();
             memberDto.lastName = member.getLastName();
             memberDto.username = member.getUsername();
             memberDto.password = member.getPassword();
             memberDto.profilePictureUrl = member.getProfilePictureUrl();
+            memberDto.email = member.getEmail();
+            memberDto.phone = member.getPhone();
+            memberDto.city = member.getCity();
+            memberDto.postalCode = member.getPostalCode();
+            memberDto.street = member.getStreet();
+            memberDto.houseNumber = member.getHouseNumber();
             return memberDto;
         }
 

@@ -16,17 +16,19 @@ public class LibrarianMapper {
         librarian.setUsername(librarianInputDto.username);
         librarian.setPassword(librarianInputDto.password);
         librarian.setProfilePictureUrl(librarianInputDto.profilePictureUrl);
+        librarian.setEmail(librarianInputDto.email);
         return librarian;
     }
 
     public static LibrarianDto toResponseDto(Librarian librarian){
         LibrarianDto librarianDto = new LibrarianDto();
-        librarianDto.librarianId = librarian.getLibrarianId();
+        librarianDto.userId = librarian.getUserId();
         librarianDto.firstName = librarian.getFirstName();
         librarianDto.lastName = librarian.getLastName();
         librarianDto.username = librarian.getUsername();
         librarianDto.password = librarian.getPassword();
         librarianDto.profilePictureUrl = librarian.getProfilePictureUrl();
+        librarianDto.email = librarian.getEmail();
         return librarianDto;
     }
 
