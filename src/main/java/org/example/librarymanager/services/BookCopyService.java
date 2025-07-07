@@ -25,7 +25,7 @@ public class BookCopyService {
         this.bookRepository = bookRepository;
     }
 
-    @Transactional
+
     public BookCopyDto createBookCopy(BookCopyInputDto bookCopyInputDto) {
         if (bookCopyInputDto.ISBN == null || bookCopyInputDto.ISBN.trim().isEmpty()) {
             throw new IllegalArgumentException("ISBN mag niet leeg zijn.");

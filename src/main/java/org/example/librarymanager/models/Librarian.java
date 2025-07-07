@@ -2,6 +2,7 @@ package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "librarians")
@@ -9,20 +10,15 @@ import jakarta.validation.constraints.NotNull;
 
 public class Librarian extends User {
 
-    //TODO: automatisch laten ophogen
-    private Long librarianId;
-
     @NotNull
     @Column(nullable = false)
+    @Size(min = 3, max = 250)
     private String firstName;
     @NotNull
     @Column(nullable = false)
+    @Size(min = 3, max = 250)
     private String lastName;
 
-    public Librarian(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
 
     public Librarian() {
     }
@@ -30,15 +26,6 @@ public class Librarian extends User {
     @Override
     public String getRole() {
         return "Librarian";
-    }
-
-    public Long getLibrarianId() {
-        return librarianId;
-    }
-
-    //TODO: automatisch ophogen
-    public void setLibrarianId(Long librarianId) {
-        this.librarianId = librarianId;
     }
 
     public @NotNull String getFirstName() {

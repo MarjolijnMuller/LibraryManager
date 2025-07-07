@@ -12,5 +12,4 @@ public class BookDto {
     public BookCategory category;
     public int totalCopies;
 
-    //TODO: eventueel numberOfCopies?
 }
