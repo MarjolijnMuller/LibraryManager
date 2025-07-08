@@ -18,8 +18,8 @@ public class GlobalExceptionHandler {
     /**
      * Handelt ResourceNotFountException af en retourneert een 404 Not Found.
      */
-    @ExceptionHandler(ResourceNotFountException.class)
-    public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFountException ex, WebRequest request) {
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.NOT_FOUND.value());
