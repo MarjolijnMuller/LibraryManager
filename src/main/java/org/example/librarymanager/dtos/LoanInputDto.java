@@ -7,13 +7,13 @@ import java.time.LocalDate;
 
 public class LoanInputDto {
     @NotNull
-    @Column(nullable = false)
     public LocalDate loanDate;
-
     @NotNull
-    @Column(nullable = false)
     public LocalDate returnDate;
-
-    @Column(nullable = false)
-    public boolean isReturned = false;
+    @NotNull
+    public boolean isReturned;
+    @NotNull
+    public Long bookCopyId;
+    @NotNull
+    public Long userId;
 }
