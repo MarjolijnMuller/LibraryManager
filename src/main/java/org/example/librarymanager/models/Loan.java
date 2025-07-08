@@ -19,8 +19,6 @@ public class Loan {
 
     @NotNull
     @Column(nullable = false)
-    private LocalDate dueDate;
-
     private LocalDate returnDate;
 
     @Column(nullable = false)
@@ -39,9 +37,8 @@ public class Loan {
     @OneToOne(mappedBy = "loan")
     private Fine fine;
 
-    public Loan(LocalDate loanDate, LocalDate dueDate, LocalDate returnDate, boolean isReturned, BookCopy bookCopy, Member member, Fine fine) {
+    public Loan(LocalDate loanDate, LocalDate returnDate, boolean isReturned, BookCopy bookCopy, Member member, Fine fine) {
         this.loanDate = loanDate;
-        this.dueDate = dueDate;
         this.returnDate = returnDate;
         this.isReturned = isReturned;
         this.bookCopy = bookCopy;
@@ -61,14 +58,6 @@ public class Loan {
 
     public void setLoanDate(@NotNull LocalDate loanDate) {
         this.loanDate = loanDate;
-    }
-
-    public @NotNull LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(@NotNull LocalDate dueDate) {
-        this.dueDate = dueDate;
     }
 
     public LocalDate getReturnDate() {
