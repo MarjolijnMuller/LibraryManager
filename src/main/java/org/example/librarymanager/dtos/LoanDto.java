@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public class LoanDto {
     public Long loanId;
-    public LocalDate date;
+    public LocalDate loanDate;
     public LocalDate returnDate;
     public boolean isReturned = false;
 }

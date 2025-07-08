@@ -8,7 +8,7 @@ import java.time.LocalDate;
 public class LoanInputDto {
     @NotNull
     @Column(nullable = false)
-    public LocalDate date;
+    public LocalDate loanDate;
 
     @NotNull
     @Column(nullable = false)
