@@ -30,7 +30,7 @@ public class BookCreationAndCopyController {
         URI uri = URI.create(
                 ServletUriComponentsBuilder
                         .fromCurrentRequestUri()
-                        .path("/copies/" + createdCopyDto.bookCopiesId).toUriString()
+                        .path("/copies/" + createdCopyDto.bookCopyId).toUriString()
         );
 
         return ResponseEntity.created(uri).body(createdCopyDto);

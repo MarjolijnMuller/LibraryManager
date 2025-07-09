@@ -18,20 +18,22 @@ public class LoanMapper {
         loan.setReturned(false);
         loan.setBookCopy(bookCopy);
         loan.setMember(member);
+        //loan.setFine(null);
         return loan;
     }
 
     public static LoanDto toResponseDto(Loan loan) {
         LoanDto loanDto = new LoanDto();
+        loanDto.loanId = loan.getLoanId();
         loanDto.loanDate = loan.getLoanDate();
         loanDto.returnDate = loan.getReturnDate();
         loanDto.isReturned = loan.isReturned();
 
         if (loan.getBookCopy() != null) {
-            loanDto.bookCopyId = loan.getBookCopy().getBookCopiesId();
+            loanDto.bookCopyId = loan.getBookCopy().getBookCopyId();
         }
         if (loan.getMember() != null) {
-            loanDto.memberId = loan.getMember().getUserId();
+            loanDto.userId = loan.getMember().getUserId();
         }
         //TODO: toevoegen:
         /*if (loan.getFine() != null) {

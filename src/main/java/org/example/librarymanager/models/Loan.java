@@ -25,12 +25,12 @@ public class Loan {
     private boolean isReturned = false;
 
     @ManyToOne
-    @JoinColumn(name="bookCopyId", nullable=false)
+    @JoinColumn(name = "book_copy_id", nullable = false)
     @NotNull
         private BookCopy bookCopy;
 
     @ManyToOne
-    @JoinColumn(name="userId")
+    @JoinColumn(name="userId", nullable = false)
     @NotNull
     private Member member;
 
@@ -50,6 +50,10 @@ public class Loan {
 
     public Long getLoanId() {
         return loanId;
+    }
+
+    public void setLoanId(Long loanId) {
+        this.loanId = loanId;
     }
 
     public @NotNull LocalDate getLoanDate() {
@@ -72,7 +76,7 @@ public class Loan {
         return isReturned;
     }
 
-    public void setReturned(boolean returned) {
+    public void setReturned(Boolean returned) {
         isReturned = returned;
     }
 

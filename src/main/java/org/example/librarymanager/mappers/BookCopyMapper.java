@@ -14,7 +14,7 @@ public class BookCopyMapper {
         }
 
         BookCopyDto dto = new BookCopyDto();
-        dto.bookCopiesId = bookCopy.getBookCopiesId();
+        dto.bookCopyId = bookCopy.getBookCopyId();
         dto.followNumber = bookCopy.getFollowNumber();
         dto.status = bookCopy.getStatus();
 

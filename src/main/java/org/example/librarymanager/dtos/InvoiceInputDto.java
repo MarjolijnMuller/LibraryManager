@@ -12,7 +12,6 @@ import java.time.LocalDate;
 
 public class InvoiceInputDto {
     @NotNull
-    @Column(nullable = false)
     public LocalDate invoiceDate;
 
     @Size(min=3, max=250)
@@ -20,11 +19,8 @@ public class InvoiceInputDto {
 
     @NotNull
     @PositiveOrZero
-    @Column(nullable = false)
     public Double invoiceAmount;
 
     @NotNull
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
     public String paymentStatus;
 }

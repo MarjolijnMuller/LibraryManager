@@ -12,10 +12,9 @@ import java.util.Optional;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
     List<Loan> findByMember(Member member);
-    List<Loan> findByMemberUserId(Long memberId);
+    List<Loan> findByMemberUserId(Long userId);
 
     List<Loan> findByBookCopy(BookCopy bookCopy);
-    Optional<Loan> findByBookCopyBookCopyId(Long bookCopyId);
 
     List<Loan> findByIsReturnedFalse();
 

@@ -2,6 +2,7 @@ package org.example.librarymanager.services;
 
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
+import org.example.librarymanager.dtos.LoanPatchDto;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.LoanMapper;
 import org.example.librarymanager.models.BookCopy;
@@ -35,12 +36,11 @@ public class LoanService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + loanInputDto.userId));
 
         if (loanRepository.findByBookCopyAndIsReturnedFalse(bookCopy).isPresent()) {
-            throw new IllegalArgumentException("Bookcopy with ID " + bookCopy.getBookCopiesId() + " has already been borrowed.");
+            throw new IllegalArgumentException("Bookcopy with ID " + bookCopy.getBookCopyId() + " has already been borrowed.");
         }
 
         Loan newLoan = LoanMapper.toEntity(loanInputDto, bookCopy, member);
         Loan savedLoan = loanRepository.save(newLoan);
-
         bookCopy.setStatus(BookCopyStatus.ON_LOAN);
         bookCopyRepository.save(bookCopy);
 
@@ -55,8 +55,8 @@ public class LoanService {
         return LoanMapper.toResponseDto(loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId)));
     }
 
-    public List<LoanDto> getLoansByMemberId(Long memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + memberId));
+    public List<LoanDto> getLoansByMemberId(Long userId) {
+        Member member = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
         return LoanMapper.toResponseDtoList(loanRepository.findByMember(member));
 
     }
@@ -102,27 +102,41 @@ public class LoanService {
 
         existingLoan.setLoanDate(loanInputDto.loanDate);
         existingLoan.setReturnDate(loanInputDto.returnDate);
-        existingLoan.setReturned(loanInputDto.isReturned); // PUT updates this as well
+        existingLoan.setReturned(loanInputDto.isReturned);
         existingLoan.setBookCopy(bookCopy);
         existingLoan.setMember(member);
 
         return LoanMapper.toResponseDto(loanRepository.save(existingLoan));
     }
 
-    public Loan patchLoan(Long loanId, LoanInputDto loanInputDto) {
-        Loan existingLoan = loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
+    public LoanDto patchLoan(Long loanId, LoanPatchDto loanPatchDto) {
+        Loan existingLoan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
 
-        if (loanInputDto.loanDate != null) {
-            existingLoan.setLoanDate(loanInputDto.loanDate);
+        if (loanPatchDto.loanDate != null) {
+            existingLoan.setLoanDate(loanPatchDto.loanDate);
         }
-        if (loanInputDto.returnDate != null) {
-            existingLoan.setReturnDate(loanInputDto.returnDate);
-        }
-        if (loanInputDto.isReturned) {
-            existingLoan.setReturned(false);
+        if (loanPatchDto.returnDate != null) {
+            existingLoan.setReturnDate(loanPatchDto.returnDate);
         }
 
-        return this.loanRepository.save(existingLoan);
+        if (loanPatchDto.isReturned != null) {
+            existingLoan.setReturned(loanPatchDto.isReturned);
+        }
+
+        if (loanPatchDto.bookCopyId != null) {
+            BookCopy bookCopy = bookCopyRepository.findById(loanPatchDto.bookCopyId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Book copy not found with ID: " + loanPatchDto.bookCopyId));
+            existingLoan.setBookCopy(bookCopy);
+        }
+
+        if (loanPatchDto.userId != null) {
+            Member member = memberRepository.findById(loanPatchDto.userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + loanPatchDto.userId));
+            existingLoan.setMember(member);
+        }
+
+        return LoanMapper.toResponseDto(this.loanRepository.save(existingLoan));
     }
 
     public void deleteLoan(Long loanId) {
