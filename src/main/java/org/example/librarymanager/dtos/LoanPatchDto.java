@@ -8,4 +8,5 @@ public class LoanPatchDto {
     public Boolean isReturned;
     public Long bookCopyId;
     public Long userId;
+    public Long fineId;
 }

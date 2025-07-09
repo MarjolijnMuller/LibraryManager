@@ -1,14 +1,22 @@
 package org.example.librarymanager.dtos;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+
+import java.time.LocalDate;
 
 public class FineInputDto {
     @NotNull
     @PositiveOrZero
-    public Double amount;
+    public Double fineAmount;
 
     @NotNull
-    @PositiveOrZero
-    public Integer overdueDays;
+    public LocalDate fineDate;
+    public boolean isPaid = false;
+
+    @NotNull
+    public Long loanId;
+    @NotNull
+    public Long invoiceId;
 }
