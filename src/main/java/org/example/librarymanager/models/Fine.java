@@ -23,12 +23,12 @@ public class Fine {
     private Integer overdueDays;
 
     @OneToOne
-    @JoinColumn(name="loanId")
+    @JoinColumn(name="loan_id")
     @NotNull
     private Loan loan;
 
     @ManyToOne
-    @JoinColumn(name="invoiceId")
+    @JoinColumn(name="invoice_id")
     private Invoice invoice;
 
     public Fine(Double amount, Integer overdueDays, Loan loan, Invoice invoice) {
