@@ -22,7 +22,7 @@ public class Loan {
     private LocalDate returnDate;
 
     @Column(nullable = false)
-    private boolean isReturned = false;
+    private Boolean isReturned = false;
 
     @ManyToOne
     @JoinColumn(name = "book_copy_id", nullable = false)
@@ -37,7 +37,7 @@ public class Loan {
     @OneToOne(mappedBy = "loan")
     private Fine fine;
 
-    public Loan(LocalDate loanDate, LocalDate returnDate, boolean isReturned, BookCopy bookCopy, Member member, Fine fine) {
+    public Loan(LocalDate loanDate, LocalDate returnDate, Boolean isReturned, BookCopy bookCopy, Member member, Fine fine) {
         this.loanDate = loanDate;
         this.returnDate = returnDate;
         this.isReturned = isReturned;
@@ -72,7 +72,7 @@ public class Loan {
         this.returnDate = returnDate;
     }
 
-    public boolean isReturned() {
+    public Boolean isReturned() {
         return isReturned;
     }
 

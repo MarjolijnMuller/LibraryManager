@@ -11,7 +11,7 @@ public class FineDto {
     public long fineId;
     public Double fineAmount;
     public LocalDate fineDate;
-    public boolean isPaid = false;
+    public Boolean isPaid = false;
     public Long loanId;
     public Long invoiceId;
 }

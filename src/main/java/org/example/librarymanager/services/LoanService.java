@@ -5,15 +5,14 @@ import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.dtos.LoanPatchDto;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.LoanMapper;
-import org.example.librarymanager.models.BookCopy;
-import org.example.librarymanager.models.BookCopyStatus;
-import org.example.librarymanager.models.Loan;
-import org.example.librarymanager.models.Member;
+import org.example.librarymanager.models.*;
 import org.example.librarymanager.repositories.BookCopyRepository;
+import org.example.librarymanager.repositories.FineRepository;
 import org.example.librarymanager.repositories.LoanRepository;
 import org.example.librarymanager.repositories.MemberRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -73,7 +72,7 @@ public class LoanService {
         bookCopyRepository.save(bookCopy);
 
         //TODO: berekening boete (let op het liefst per boek per dag
-        /*LocalDate actualReturnDate = LocalDate.now(); // Of de datum die de gebruiker meegeeft
+        LocalDate actualReturnDate = LocalDate.now(); // Of de datum die de gebruiker meegeeft
         if (actualReturnDate.isAfter(loan.getReturnDate())) {
             // Dit is een simpele berekening, pas dit aan naar je eigen regels
             long overdueDays = java.time.temporal.ChronoUnit.DAYS.between(loan.getReturnDate(), actualReturnDate);
@@ -84,7 +83,7 @@ public class LoanService {
                 loan.setFine(newFine); // Zorgt ervoor dat de OneToOne relatie in Loan wordt gezet
                 fineRepository.save(newFine); // Sla de boete expliciet op
             }
-        }*/
+        }
         return LoanMapper.toResponseDto(loanRepository.save(loan));
     }
 

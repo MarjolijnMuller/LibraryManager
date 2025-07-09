@@ -13,7 +13,7 @@ public class FineInputDto {
 
     @NotNull
     public LocalDate fineDate;
-    public boolean isPaid = false;
+    public Boolean isPaid = false;
 
     @NotNull
     public Long loanId;
