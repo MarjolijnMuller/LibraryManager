@@ -1,18 +1,14 @@
 package org.example.librarymanager.services;
 
-import org.example.librarymanager.dtos.InvoiceDto;
 import org.example.librarymanager.dtos.InvoiceInputDto;
-import org.example.librarymanager.dtos.LibrarianInputDto;
-import org.example.librarymanager.exceptions.ResourceNotFountException;
+import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.InvoiceMapper;
 import org.example.librarymanager.models.Invoice;
-import org.example.librarymanager.models.Librarian;
 import org.example.librarymanager.models.PaymentStatus;
 import org.example.librarymanager.repositories.InvoiceRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -24,8 +20,8 @@ public class InvoiceService {
     }
 
 
-    public Invoice createInvoice(InvoiceInputDto invoieInputDto){
-        return this.invoiceRepository.save(InvoiceMapper.toEntity(invoieInputDto));
+    public Invoice createInvoice(InvoiceInputDto invoiceInputDto){
+        return this.invoiceRepository.save(InvoiceMapper.toEntity(invoiceInputDto));
     }
 
     public List<Invoice> getAllInvoices(){
@@ -33,7 +29,7 @@ public class InvoiceService {
     }
 
     public Invoice getInvoiceById(Long invoiceId){
-        return this.invoiceRepository.findById(invoiceId).orElseThrow(() -> new ResourceNotFountException("Invoice not found with ID: " + invoiceId));
+        return this.invoiceRepository.findById(invoiceId).orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
     }
 
     public List<Invoice> getInvoicesByDate(LocalDate date){
@@ -62,7 +58,7 @@ public class InvoiceService {
 
     public Invoice updateInvoice(Long invoiceId, InvoiceInputDto invoiceInputDto){
         Invoice existingInvoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new ResourceNotFountException("Invoice not found with ID: " + invoiceId));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
 
         if (invoiceInputDto.invoicePeriod != null) {
             existingInvoice.setInvoicePeriod(invoiceInputDto.invoicePeriod);
@@ -83,7 +79,7 @@ public class InvoiceService {
     }
 
     public Invoice patchInvoice(Long invoiceId, InvoiceInputDto updates) {
-        Invoice existingInvoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> new ResourceNotFountException("Invoice not found with ID: " + invoiceId));
+        Invoice existingInvoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
 
         if (updates.invoicePeriod != null) {
             existingInvoice.setInvoicePeriod(updates.invoicePeriod);

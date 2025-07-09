@@ -19,29 +19,26 @@ public class Loan {
 
     @NotNull
     @Column(nullable = false)
-    private LocalDate dueDate;
-
     private LocalDate returnDate;
 
     @Column(nullable = false)
     private boolean isReturned = false;
 
     @ManyToOne
-    @JoinColumn(name="bookCopyId", nullable=false)
+    @JoinColumn(name = "book_copy_id", nullable = false)
     @NotNull
         private BookCopy bookCopy;
 
     @ManyToOne
-    @JoinColumn(name="userId")
+    @JoinColumn(name="userId", nullable = false)
     @NotNull
     private Member member;
 
     @OneToOne(mappedBy = "loan")
     private Fine fine;
 
-    public Loan(LocalDate loanDate, LocalDate dueDate, LocalDate returnDate, boolean isReturned, BookCopy bookCopy, Member member, Fine fine) {
+    public Loan(LocalDate loanDate, LocalDate returnDate, boolean isReturned, BookCopy bookCopy, Member member, Fine fine) {
         this.loanDate = loanDate;
-        this.dueDate = dueDate;
         this.returnDate = returnDate;
         this.isReturned = isReturned;
         this.bookCopy = bookCopy;
@@ -55,20 +52,16 @@ public class Loan {
         return loanId;
     }
 
+    public void setLoanId(Long loanId) {
+        this.loanId = loanId;
+    }
+
     public @NotNull LocalDate getLoanDate() {
         return loanDate;
     }
 
     public void setLoanDate(@NotNull LocalDate loanDate) {
         this.loanDate = loanDate;
-    }
-
-    public @NotNull LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(@NotNull LocalDate dueDate) {
-        this.dueDate = dueDate;
     }
 
     public LocalDate getReturnDate() {
@@ -83,7 +76,7 @@ public class Loan {
         return isReturned;
     }
 
-    public void setReturned(boolean returned) {
+    public void setReturned(Boolean returned) {
         isReturned = returned;
     }
 

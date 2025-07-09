@@ -2,7 +2,7 @@ package org.example.librarymanager.services;
 
 import org.example.librarymanager.dtos.MemberInputDto;
 import org.example.librarymanager.dtos.UserInputDto;
-import org.example.librarymanager.exceptions.ResourceNotFountException;
+import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.MemberMapper;
 import org.example.librarymanager.models.Member;
 import org.example.librarymanager.repositories.MemberRepository;
@@ -27,7 +27,7 @@ public class MemberService {
     }
 
     public Member getMemberById(Long userId) {
-        return this.memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + userId));
+        return this.memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
     }
 
     public List<Member> getMemberByFirstName(String firstName) {
@@ -55,7 +55,7 @@ public class MemberService {
     }
 
     public Member updateMember(Long userId, MemberInputDto memberInputDto) {
-        Member existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + userId));
+        Member existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
 
         existingMember.setFirstName(memberInputDto.firstName);
         existingMember.setLastName(memberInputDto.lastName);
@@ -84,7 +84,7 @@ public class MemberService {
     }
 
     public Member patchMember(MemberInputDto memberInputDto, Long userId) {
-        Member existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Member not found with ID: " + userId));
+        Member existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
 
         if (memberInputDto.lastName != null) {
             existingMember.setLastName(memberInputDto.lastName);

@@ -2,7 +2,7 @@ package org.example.librarymanager.services;
 
 import org.example.librarymanager.dtos.LibrarianInputDto;
 import org.example.librarymanager.dtos.UserInputDto;
-import org.example.librarymanager.exceptions.ResourceNotFountException;
+import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.LibrarianMapper;
 import org.example.librarymanager.models.Librarian;
 import org.example.librarymanager.repositories.LibrarianRepository;
@@ -27,7 +27,7 @@ public class LibrarianService {
     }
 
     public Librarian getLibrarianById(Long userId) {
-        return this.librarianRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Librarian not found with ID: " + userId));
+        return this.librarianRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Librarian not found with ID: " + userId));
     }
 
     public  List<Librarian> getLibrarianByFirstName(String firstName) {
@@ -53,7 +53,7 @@ public class LibrarianService {
     public Librarian updateLibrarian(LibrarianInputDto librarianInputDto, Long userId) {
 
         Librarian existingLibrarian = librarianRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFountException("Librarian not found with ID: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Librarian not found with ID: " + userId));
 
         if (librarianInputDto.profilePictureUrl != null) {
             existingLibrarian.setProfilePictureUrl(librarianInputDto.profilePictureUrl);
@@ -74,7 +74,7 @@ public class LibrarianService {
     }
 
     public Librarian patchLibrarian(LibrarianInputDto updates, Long userId) {
-        Librarian existingLibrarian = librarianRepository.findById(userId).orElseThrow(() -> new ResourceNotFountException("Librarian not found with ID: " + userId));
+        Librarian existingLibrarian = librarianRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Librarian not found with ID: " + userId));
 
         if (updates.profilePictureUrl != null) {
             existingLibrarian.setProfilePictureUrl(updates.profilePictureUrl);

@@ -1,8 +1,7 @@
 package org.example.librarymanager.services;
 
 import org.example.librarymanager.dtos.BookInputDto;
-import org.example.librarymanager.exceptions.ResourceNotFountException;
-import org.example.librarymanager.mappers.BookMapper;
+import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.models.Book;
 import org.example.librarymanager.models.BookCategory;
 import org.example.librarymanager.repositories.BookCopyRepository;
@@ -41,7 +40,7 @@ public class BookService {
 
     public Book getBookByISBN(String isbn) {
         return this.bookRepository.findBookByISBN(isbn)
-                .orElseThrow(() -> new ResourceNotFountException("Book not found with ISBN: " + isbn));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ISBN: " + isbn));
     }
 
     public List<Book> getBooksByCategory(BookCategory category) {
@@ -50,7 +49,7 @@ public class BookService {
 
     public Book updateBook(Long bookId, BookInputDto bookInputDto) {
         Book existingBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResourceNotFountException("Book not found with ID: " + bookId));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ID: " + bookId));
 
         existingBook.setTitle(bookInputDto.title);
         existingBook.setAuthorFirstName(bookInputDto.authorFirstName);
@@ -73,7 +72,7 @@ public class BookService {
 
     public Book patchBook(Long bookId, BookInputDto updates) {
         Book existingBook = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResourceNotFountException("Book not found with ID: " + bookId));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ID: " + bookId));
 
         if (updates.title != null) {
             existingBook.setTitle(updates.title);

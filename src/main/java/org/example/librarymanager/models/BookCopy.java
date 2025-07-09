@@ -1,7 +1,6 @@
 package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "bookCopies")
@@ -9,8 +8,9 @@ public class BookCopy {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookCopiesId;
+    private Long bookCopyId;
 
+    @Column
     private Long followNumber;
 
     @Enumerated(EnumType.STRING)
@@ -30,8 +30,8 @@ public class BookCopy {
     public BookCopy() {
     }
 
-    public Long getBookCopiesId() {
-        return bookCopiesId;
+    public Long getBookCopyId() {
+        return bookCopyId;
     }
 
     public Long getFollowNumber() {
