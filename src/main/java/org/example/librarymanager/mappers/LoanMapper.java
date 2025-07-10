@@ -18,7 +18,6 @@ public class LoanMapper {
         loan.setReturned(false);
         loan.setBookCopy(bookCopy);
         loan.setMember(member);
-        //loan.setFine(null);
         return loan;
     }
 
@@ -35,10 +34,6 @@ public class LoanMapper {
         if (loan.getMember() != null) {
             loanDto.userId = loan.getMember().getUserId();
         }
-        //TODO: toevoegen:
-        /*if (loan.getFine() != null) {
-            loanDto.fineId = loan.getFine().getFineId();
-        }*/
 
         return loanDto;
     }

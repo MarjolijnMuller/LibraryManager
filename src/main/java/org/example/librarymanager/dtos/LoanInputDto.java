@@ -16,4 +16,5 @@ public class LoanInputDto {
     public Long bookCopyId;
     @NotNull
     public Long userId;
+    public Long fineId;
 }

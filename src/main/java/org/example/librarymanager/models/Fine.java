@@ -4,38 +4,51 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name="fines")
 public class Fine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long fineId;
+    private Long fineId;
 
     @NotNull
     @PositiveOrZero
     @Column(nullable = false)
-    private Double amount;
+    private Double fineAmount;
 
     @NotNull
-    @PositiveOrZero
     @Column(nullable = false)
-    private Integer overdueDays;
+    private LocalDate fineDate;
 
-    @OneToOne
-    @JoinColumn(name="loanId")
+    @Column(nullable = false)
+    private Boolean isPaid = false;
+
+    @ManyToOne
+    @JoinColumn(name="loan_id")
     @NotNull
     private Loan loan;
 
     @ManyToOne
-    @JoinColumn(name="invoiceId")
+    @JoinColumn(name="invoice_id")
     private Invoice invoice;
 
-    public Fine(Double amount, Integer overdueDays, Loan loan, Invoice invoice) {
-        this.amount = amount;
-        this.overdueDays = overdueDays;
+    public Fine(Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan, Invoice invoice) {
+        this.fineAmount = fineAmount;
+        this.fineDate = fineDate;
+        this.isPaid = isPaid;
         this.loan = loan;
         this.invoice = invoice;
+    }
+
+    public Fine(Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan) {
+        this.fineAmount = fineAmount;
+        this.fineDate = fineDate;
+        this.isPaid = isPaid;
+        this.loan = loan;
+        this.invoice = null;
     }
 
     public Fine() {}
@@ -44,20 +57,32 @@ public class Fine {
         return fineId;
     }
 
-    public @NotNull @PositiveOrZero Double getAmount() {
-        return amount;
+    public void setFineId(long fineId) {
+        this.fineId = fineId;
     }
 
-    public void setAmount(@NotNull @PositiveOrZero Double amount) {
-        this.amount = amount;
+    public @NotNull @PositiveOrZero Double getFineAmount() {
+        return fineAmount;
     }
 
-    public @NotNull @PositiveOrZero Integer getOverdueDays() {
-        return overdueDays;
+    public void setFineAmount(@NotNull @PositiveOrZero Double fineAmount) {
+        this.fineAmount = fineAmount;
     }
 
-    public void setOverdueDays(@NotNull @PositiveOrZero Integer overdueDays) {
-        this.overdueDays = overdueDays;
+    public @NotNull LocalDate getFineDate() {
+        return fineDate;
+    }
+
+    public void setFineDate(@NotNull LocalDate fineDate) {
+        this.fineDate = fineDate;
+    }
+
+    public Boolean isPaid() {
+        return isPaid;
+    }
+
+    public void setPaid(Boolean paid) {
+        isPaid = paid;
     }
 
     public @NotNull Loan getLoan() {
@@ -75,4 +100,6 @@ public class Fine {
     public void setInvoice(Invoice invoice) {
         this.invoice = invoice;
     }
+
+
 }

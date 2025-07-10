@@ -12,7 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@ControllerAdvice // Deze annotatie maakt dit een globale exception handler
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
     /**

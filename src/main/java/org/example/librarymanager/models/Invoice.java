@@ -34,7 +34,7 @@ public class Invoice {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    @OneToMany(mappedBy="invoice")
+    @OneToMany(mappedBy="invoice", cascade = CascadeType.ALL)
     private List<Fine> fines = new ArrayList<>();
 
     public Invoice(LocalDate invoiceDate, String invoicePeriod, Double invoiceAmount, PaymentStatus paymentStatus, List<Fine> fines) {
