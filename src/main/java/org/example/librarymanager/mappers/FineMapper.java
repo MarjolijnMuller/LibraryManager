@@ -23,6 +23,7 @@ public class FineMapper {
 
     public static FineDto toResponseDto(Fine fine) {
         FineDto fineDto = new FineDto();
+        fineDto.fineId = fine.getFineId();
         fineDto.fineAmount = fine.getFineAmount();
         fineDto.fineDate = fine.getFineDate();
         fineDto.isPaid = fine.isPaid();

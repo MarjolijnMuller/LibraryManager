@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="loans")
@@ -34,16 +36,15 @@ public class Loan {
     @NotNull
     private Member member;
 
-    @OneToOne(mappedBy = "loan")
-    private Fine fine;
+    @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
+    private List<Fine> fines = new ArrayList<>();
 
-    public Loan(LocalDate loanDate, LocalDate returnDate, Boolean isReturned, BookCopy bookCopy, Member member, Fine fine) {
+    public Loan(LocalDate loanDate, LocalDate returnDate, Boolean isReturned, BookCopy bookCopy, Member member) {
         this.loanDate = loanDate;
         this.returnDate = returnDate;
         this.isReturned = isReturned;
         this.bookCopy = bookCopy;
         this.member = member;
-        this.fine = fine;
     }
 
     public Loan() {}
@@ -94,16 +95,5 @@ public class Loan {
 
     public void setMember(@NotNull Member member) {
         this.member = member;
-    }
-
-    public Fine getFine() {
-        return fine;
-    }
-
-    public void setFine(Fine fine) {
-        if (fine != null){
-            fine.setLoan(this);
-        }
-        this.fine = fine;
     }
 }

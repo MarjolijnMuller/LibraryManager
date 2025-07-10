@@ -2,6 +2,7 @@ package org.example.librarymanager.services;
 
 import org.example.librarymanager.dtos.FineDto;
 import org.example.librarymanager.dtos.FineInputDto;
+import org.example.librarymanager.dtos.FinePatchDto;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.FineMapper;
 import org.example.librarymanager.mappers.LoanMapper;
@@ -86,24 +87,25 @@ public class FineService {
         return FineMapper.toResponseDto(fineRepository.save(existingFine));
     }
 
-    public FineDto patchFine(Long fineId, FineDto fineDto) {
+    public FineDto patchFine(Long fineId, FinePatchDto finePatchDto) {
         Fine existingFine = fineRepository.findById(fineId).orElseThrow(() -> new ResourceNotFoundException("Fine not found with ID: " + fineId));
 
-        if (fineDto.fineAmount != null) {
-            existingFine.setFineAmount(fineDto.fineAmount);
+        if (finePatchDto.fineAmount != null) {
+            existingFine.setFineAmount(finePatchDto.fineAmount);
         }
-        if (fineDto.fineDate != null) {
-            existingFine.setFineDate(fineDto.fineDate);
+        if (finePatchDto.fineDate != null) {
+            existingFine.setFineDate(finePatchDto.fineDate);
         }
-        if (fineDto.isPaid != existingFine.isPaid()) {
-            existingFine.setPaid(fineDto.isPaid);
+        if (finePatchDto.isPaid != null) {
+            existingFine.setPaid(finePatchDto.isPaid);
         }
-        if (fineDto.loanId != null) {
-            Loan loan = loanRepository.findById(fineDto.loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + fineDto.loanId));
+        if (finePatchDto.loanId != null) {
+            Loan loan = loanRepository.findById(finePatchDto.loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + finePatchDto.loanId));
             existingFine.setLoan(loan);
         }
-        if (fineDto.invoiceId != null) {
-            Invoice invoice = invoiceRepository.findById(fineDto.invoiceId).orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + fineDto.invoiceId));
+        if (finePatchDto.invoiceId != null) {
+            Invoice invoice = invoiceRepository.findById(finePatchDto.invoiceId).orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + finePatchDto.invoiceId));
+            existingFine.setInvoice(invoice);
         }
         return FineMapper.toResponseDto(fineRepository.save(existingFine));
     }

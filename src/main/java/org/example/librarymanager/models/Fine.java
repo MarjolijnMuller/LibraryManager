@@ -12,7 +12,7 @@ public class Fine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long fineId;
+    private Long fineId;
 
     @NotNull
     @PositiveOrZero
@@ -26,7 +26,7 @@ public class Fine {
     @Column(nullable = false)
     private Boolean isPaid = false;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="loan_id")
     @NotNull
     private Loan loan;
@@ -35,13 +35,20 @@ public class Fine {
     @JoinColumn(name="invoice_id")
     private Invoice invoice;
 
-    public Fine(long fineId, Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan, Invoice invoice) {
-        this.fineId = fineId;
+    public Fine(Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan, Invoice invoice) {
         this.fineAmount = fineAmount;
         this.fineDate = fineDate;
         this.isPaid = isPaid;
         this.loan = loan;
         this.invoice = invoice;
+    }
+
+    public Fine(Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan) {
+        this.fineAmount = fineAmount;
+        this.fineDate = fineDate;
+        this.isPaid = isPaid;
+        this.loan = loan;
+        this.invoice = null;
     }
 
     public Fine() {}
@@ -93,4 +100,6 @@ public class Fine {
     public void setInvoice(Invoice invoice) {
         this.invoice = invoice;
     }
+
+
 }

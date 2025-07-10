@@ -1,10 +1,11 @@
 package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table (name = "members")
@@ -40,7 +41,8 @@ public class Member extends User{
 
     private String phone;
 
-
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Loan> loans = new ArrayList<>();
 
     public Member() {}
 
@@ -103,5 +105,13 @@ public class Member extends User{
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public List<Loan> getLoans() {
+        return loans;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
     }
 }
