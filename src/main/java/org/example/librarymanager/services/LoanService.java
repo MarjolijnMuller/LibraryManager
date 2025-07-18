@@ -6,10 +6,7 @@ import org.example.librarymanager.dtos.LoanPatchDto;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.LoanMapper;
 import org.example.librarymanager.models.*;
-import org.example.librarymanager.repositories.BookCopyRepository;
-import org.example.librarymanager.repositories.FineRepository;
-import org.example.librarymanager.repositories.LoanRepository;
-import org.example.librarymanager.repositories.UserInformationRepository;
+import org.example.librarymanager.repositories.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,13 +16,13 @@ import java.util.List;
 public class LoanService {
     private final LoanRepository loanRepository;
     private final BookCopyRepository bookCopyRepository;
-    private final UserInformationRepository userInformationRepository;
+    private final UserRepository userRepository;
     private final FineRepository fineRepository;
 
-    public LoanService(LoanRepository loanRepository, BookCopyRepository bookCopyRepository, UserInformationRepository userInformationRepository, FineRepository fineRepository) {
+    public LoanService(LoanRepository loanRepository, BookCopyRepository bookCopyRepository, UserRepository userRepository, FineRepository fineRepository) {
         this.loanRepository = loanRepository;
         this.bookCopyRepository = bookCopyRepository;
-        this.userInformationRepository = userInformationRepository;
+        this.userRepository = userRepository;
         this.fineRepository = fineRepository;
     }
 
@@ -33,20 +30,21 @@ public class LoanService {
         BookCopy bookCopy = bookCopyRepository.findById(loanInputDto.bookCopyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bookcopy not found with ID: " + loanInputDto.bookCopyId));
 
-        UserInformation userInformation = userInformationRepository.findById(loanInputDto.userId)
+        User user = userRepository.findById(loanInputDto.userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + loanInputDto.userId));
 
         if (loanRepository.findByBookCopyAndIsReturnedFalse(bookCopy).isPresent()) {
             throw new IllegalArgumentException("Bookcopy with ID " + bookCopy.getBookCopyId() + " has already been borrowed.");
         }
 
-        Loan newLoan = LoanMapper.toEntity(loanInputDto, bookCopy, userInformation);
+        Loan newLoan = LoanMapper.toEntity(loanInputDto, bookCopy, user);
         Loan savedLoan = loanRepository.save(newLoan);
         bookCopy.setStatus(BookCopyStatus.ON_LOAN);
         bookCopyRepository.save(bookCopy);
 
         return LoanMapper.toResponseDto(savedLoan);
     }
+
 
     public List<LoanDto> getAllLoans() {
         return LoanMapper.toResponseDtoList(loanRepository.findAll());
@@ -56,9 +54,9 @@ public class LoanService {
         return LoanMapper.toResponseDto(loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId)));
     }
 
-    public List<LoanDto> getLoansByMemberId(Long userId) {
-        UserInformation userInformation = userInformationRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
-        return LoanMapper.toResponseDtoList(loanRepository.findByUserInformation(userInformation));
+    public List<LoanDto> getLoansByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+        return LoanMapper.toResponseDtoList(loanRepository.findByUser(user));
     }
 
     public LoanDto returnBookCopy(Long loanId) {
@@ -111,14 +109,14 @@ public class LoanService {
         BookCopy bookCopy = bookCopyRepository.findById(loanInputDto.bookCopyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Boekexemplaar niet gevonden met ID: " + loanInputDto.bookCopyId));
 
-        UserInformation userInformation = userInformationRepository.findById(loanInputDto.userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Lid niet gevonden met ID: " + loanInputDto.userId));
+        User user = userRepository.findById(loanInputDto.userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lid (User) niet gevonden met ID: " + loanInputDto.userId));
 
         existingLoan.setLoanDate(loanInputDto.loanDate);
         existingLoan.setReturnDate(loanInputDto.returnDate);
         existingLoan.setReturned(loanInputDto.isReturned);
         existingLoan.setBookCopy(bookCopy);
-        existingLoan.setUserInformation(userInformation);
+        existingLoan.setUser(user);
 
         return LoanMapper.toResponseDto(loanRepository.save(existingLoan));
     }
@@ -145,9 +143,9 @@ public class LoanService {
         }
 
         if (loanPatchDto.userId != null) {
-            UserInformation userInformation = userInformationRepository.findById(loanPatchDto.userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + loanPatchDto.userId));
-            existingLoan.setUserInformation(userInformation);
+            User user = userRepository.findById(loanPatchDto.userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + loanPatchDto.userId));
+            existingLoan.setUser(user);
         }
 
         return LoanMapper.toResponseDto(this.loanRepository.save(existingLoan));

@@ -7,6 +7,7 @@ import org.example.librarymanager.models.Role;
 import org.example.librarymanager.models.User;
 import org.example.librarymanager.models.UserInformation;
 import org.example.librarymanager.repositories.RoleRepository;
+import org.springframework.stereotype.Component;
 
 
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Component
 public class UserInformationMapper {
 
     private final RoleRepository roleRepository;
@@ -76,6 +78,12 @@ public class UserInformationMapper {
         if (userInformation.getUser() != null) {
             userInformationDto.userId = userInformation.getUser().getUserId();
             userInformationDto.username = userInformation.getUser().getUsername();
+        }
+
+        if (userInformation.getUser().getRoles() != null && !userInformation.getUser().getRoles().isEmpty()) {
+            userInformationDto.roles = userInformation.getUser().getRoles().stream()
+                    .map(Role::getRolename)
+                    .collect(Collectors.toList());
         }
         return userInformationDto;
     }

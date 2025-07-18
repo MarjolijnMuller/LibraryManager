@@ -41,8 +41,8 @@ VALUES (101, 'emilylib', 'passwordEmily'),
        (204, 'oliviarmember', 'passwordOlivia'),
        (205, 'petermember', 'passwordPeter');
 
--- Insert user_information
-INSERT INTO user_information (user_information_id, user_id, first_name, last_name, street, house_number, postal_code, city, email, phone, profile_picture_url)
+-- Insert users_information
+INSERT INTO users_information (user_information_id, user_id, first_name, last_name, street, house_number, postal_code, city, email, phone, profile_picture_url)
 VALUES (1, 101, 'Emily', 'Clark', 'Bibliotheeklaan', '10', '1234AB', 'Amsterdam', 'emily.clark@example.com', '06-12345678', 'http://example.com/images/emily.jpg'),
        (2, 102, 'David', 'Jones', 'Leesplein', '5', '5678CD', 'Utrecht', 'david.jones@example.com', '06-87654321', 'http://example.com/images/david.jpg'),
        (3, 103, 'Sarah', 'Miller', 'Boekensteeg', '22', '9012EF', 'Rotterdam', 'sarah.miller@example.com', '06-11223344', 'http://example.com/images/sarah.jpg'),
@@ -53,6 +53,8 @@ VALUES (1, 101, 'Emily', 'Clark', 'Bibliotheeklaan', '10', '1234AB', 'Amsterdam'
        (8, 203, 'Michael', 'White', 'Nieuwstraat', '30', '3000EF', 'Rotterdam', 'michael.white@example.com', '0633445566', 'http://example.com/images/michael.jpg'),
        (9, 204, 'Olivia', 'Green', 'Dorpsweg', '8', '4000GH', 'Den Haag', 'olivia.green@example.com', '0644556677', 'http://example.com/images/olivia.jpg'),
        (10, 205, 'Peter', 'Black', 'Molenpad', '15B', '5000IJ', 'Eindhoven', 'peter.black@example.com', '0655667788', 'http://example.com/images/peter.jpg');
+
+SELECT setval('users_information_user_information_id_seq', (SELECT MAX(user_information_id) FROM users_information));
 
 -- Insert user_roles
 INSERT INTO user_roles (user_id, rolename)
@@ -78,11 +80,22 @@ VALUES ('2024-01-15', 'Januari 2024', 25.50, 'PAID'),
 
 -- Insert loans
 INSERT INTO loans (loan_date, return_date, is_returned, book_copy_id, user_id)
-VALUES ('2025-06-20', '2025-07-04', TRUE, 1, 201),
-       ('2025-07-01', '2025-07-15', FALSE, 3, 202),
-       ('2025-07-05', '2025-07-19', FALSE, 5, 203),
-       ('2025-05-10', '2025-05-24', TRUE, 9, 204),
-       ('2025-07-08', '2025-07-22', FALSE, 11, 205);
+VALUES
+    -- Bestaande leningen
+    ('2025-06-20', '2025-07-04', TRUE, 1, 201),
+    ('2025-06-20', '2025-07-04', TRUE, 7, 201),
+    ('2025-07-01', '2025-07-15', FALSE, 3, 202), -- Openstaand, niet achterstallig (inleverdatum 15 juli 2025)
+    ('2025-07-05', '2025-07-19', FALSE, 5, 203), -- Openstaand, niet achterstallig (inleverdatum 19 juli 2025)
+    ('2025-05-10', '2025-05-24', TRUE, 9, 204),
+    ('2025-07-08', '2025-07-22', FALSE, 11, 205), -- Openstaand, niet achterstallig (inleverdatum 22 juli 2025)
+
+    -- NIEUWE OPENSTAANDE LENINGEN (Outstanding - inleverdatum in de toekomst)
+    ('2025-07-18', '2025-08-01', FALSE, 2, 201), -- Boekcopy 2, Gebruiker 201, inleverdatum in de toekomst
+    ('2025-07-17', '2025-07-25', FALSE, 4, 202), -- Boekcopy 4 (DAMAGED, maar wordt uitgeleend), Gebruiker 202, inleverdatum in de toekomst
+
+    -- NIEUWE ACHTERSTALLIGE LENINGEN (Overdue - inleverdatum in het verleden)
+    ('2025-06-01', '2025-06-15', FALSE, 6, 203), -- Boekcopy 6, Gebruiker 203, inleverdatum 15 juni 2025 (VERSTREKEN)
+    ('2025-06-25', '2025-07-10', FALSE, 10, 204); -- Boekcopy 10 (MISSING, maar wordt uitgeleend), Gebruiker 204, inleverdatum 10 juli 2025 (VERSTREKEN)
 
 -- Insert fines
 INSERT INTO fines (fine_amount, fine_date, is_paid, loan_id, invoice_id)

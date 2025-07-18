@@ -13,4 +13,5 @@ public class LoanDto {
     public Long bookCopyId;
     public Long userId;
     public Long fineId;
+    public String status;
 }

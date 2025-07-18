@@ -9,7 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -48,6 +50,10 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private UserInformation userInformation;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Loan> loans = new ArrayList<>();
+
 
     public User(String username, String password) {
         this.username = username;

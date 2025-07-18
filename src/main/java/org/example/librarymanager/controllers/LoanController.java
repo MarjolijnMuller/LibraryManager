@@ -4,8 +4,6 @@ import jakarta.validation.Valid;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.dtos.LoanPatchDto;
-import org.example.librarymanager.mappers.LoanMapper;
-import org.example.librarymanager.models.Loan;
 import org.example.librarymanager.services.LoanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,9 +45,9 @@ public class LoanController {
         return ResponseEntity.ok(loan);
     }
 
-    @GetMapping("/member/{userId}")
-    public ResponseEntity<List<LoanDto>> getLoansByMember(@PathVariable Long userId) {
-        List<LoanDto> loans = loanService.getLoansByMemberId(userId);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<LoanDto>> getLoansByUser(@PathVariable Long userId) {
+        List<LoanDto> loans = loanService.getLoansByUserId(userId);
         return ResponseEntity.ok(loans);
     }
 

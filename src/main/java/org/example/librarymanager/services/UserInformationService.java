@@ -1,6 +1,8 @@
 package org.example.librarymanager.services;
 
+import org.example.librarymanager.dtos.UserInformationDto;
 import org.example.librarymanager.dtos.UserInformationInputDto;
+import org.example.librarymanager.dtos.UserInformationPatchDto;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.exceptions.UsernameAlreadyExistsException;
 import org.example.librarymanager.mappers.UserInformationMapper;
@@ -23,15 +25,16 @@ public class UserInformationService {
     private final UserRepository userRepository;
     private final UserInformationRepository userInformationRepository;
     private final RoleRepository roleRepository;
+    private final UserInformationMapper userInformationMapper;
 
-    public UserInformationService(UserRepository userRepository, UserInformationRepository userInformationRepository, RoleRepository roleRepository) {
+    public UserInformationService(UserRepository userRepository, UserInformationRepository userInformationRepository, RoleRepository roleRepository, UserInformationMapper userInformationMapper) {
         this.userRepository = userRepository;
         this.userInformationRepository = userInformationRepository;
         this.roleRepository = roleRepository;
-
+        this.userInformationMapper = userInformationMapper;
     }
 
-    public UserInformation createUser(UserInformationInputDto userInformationInputDto) {
+    public UserInformationDto createUser(UserInformationInputDto userInformationInputDto) {
 
         if (userRepository.findByUsername(userInformationInputDto.username).isPresent()) {
             throw new UsernameAlreadyExistsException("Username " + userInformationInputDto.username + " already exists.");
@@ -40,6 +43,7 @@ public class UserInformationService {
         User newUser = new User();
         newUser.setUsername(userInformationInputDto.username);
         newUser.setPassword(userInformationInputDto.password);
+        // TODO: wachtwoord beveiligen, hier moet een passwordEncoder komen
 
         Set<Role> assignedRoles = new HashSet<>();
         if (userInformationInputDto.roles != null && !userInformationInputDto.roles.isEmpty()) {
@@ -48,7 +52,7 @@ public class UserInformationService {
                 if (optionalRole.isPresent()) {
                     assignedRoles.add(optionalRole.get());
                 } else {
-                    // Handle invalid role (e.g., throw exception or log)
+
                 }
             }
         }
@@ -57,6 +61,8 @@ public class UserInformationService {
             roleRepository.findById("ROLE_MEMBER").ifPresent(assignedRoles::add);
         }
         newUser.setRoles(assignedRoles);
+
+        newUser = userRepository.save(newUser);
 
         UserInformation newUserInfo = new UserInformation(
                 newUser,
@@ -71,77 +77,84 @@ public class UserInformationService {
         );
         newUserInfo.setProfilePictureUrl(userInformationInputDto.profilePictureUrl);
 
-        newUser.setUserInformation(newUserInfo);
+        UserInformation savedUserInfo = userInformationRepository.save(newUserInfo);
+
+        savedUserInfo.setUser(newUser);
+        newUser.setUserInformation(savedUserInfo);
         userRepository.save(newUser);
 
-        return newUserInfo;
+        return userInformationMapper.toResponseDto(savedUserInfo);
+
     }
 
-    public UserInformation getUserById(Long id){
+    public UserInformationDto getUserById(Long id){
         UserInformation userInformation = userInformationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
-        return userInformation;
+        return userInformationMapper.toResponseDto(userInformation);
     }
 
-    public UserInformation getAllUsers() {
-        return userInformationRepository.findAll().stream().findFirst().get();
+    public List<UserInformationDto> getAllUsers() {
+        List<UserInformation> userInformations = userInformationRepository.findAll();
+        return userInformationMapper.toResponseDtoList(userInformations);
     }
 
-    public UserInformation getUserByUsername(String username) {
+    public UserInformationDto getUserByUsername(String username) {
         UserInformation userInformation = userInformationRepository.findByUser_Username(username).orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
-        return userInformation;
+        return userInformationMapper.toResponseDto(userInformation);
     }
 
-    public UserInformation getMemberById(Long id) {
+    public UserInformationDto getMemberById(Long id) {
         UserInformation userInformation = userInformationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Member not found with id " + id));
         if (!userInformation.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER"))) {
             throw new ResourceNotFoundException("User with id " + id + " is not a member.");
         }
-        return userInformation;
+        return userInformationMapper.toResponseDto(userInformation);
     }
 
-    public List<UserInformation> getAllMembers() {
-        return userInformationRepository.findAll().stream()
+    public List<UserInformationDto> getAllMembers() {
+        List<UserInformation> members = userInformationRepository.findAll().stream()
                 .filter(ui -> ui.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER")))
                 .collect(Collectors.toList());
+        return userInformationMapper.toResponseDtoList(members);
     }
 
-    public UserInformation getMemberByUsername(String username) {
+    public UserInformationDto getMemberByUsername(String username) {
         UserInformation userInformation = userInformationRepository.findByUser_Username(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Member with username " + username + " not found."));
 
         if (!userInformation.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER"))) {
             throw new ResourceNotFoundException("User with username " + username + " is not a member.");
         }
-        return userInformation;
+        return userInformationMapper.toResponseDto(userInformation);
     }
 
-    public UserInformation getLibrarianById(Long id) {
+    public UserInformationDto getLibrarianById(Long id) {
         UserInformation userInformation = userInformationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Librarian not found with id " + id));
         if (!userInformation.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"))) {
             throw new ResourceNotFoundException("User with id " + id + " is not a librarian.");
         }
-        return userInformation;
+        return userInformationMapper.toResponseDto(userInformation);
     }
 
-    public List<UserInformation> getAllLibrarians() {
-        return userInformationRepository.findAll().stream()
+    public List<UserInformationDto> getAllLibrarians() {
+        List<UserInformation> librarians = userInformationRepository.findAll().stream()
                 .filter(ui -> ui.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN")))
                 .collect(Collectors.toList());
+        return userInformationMapper.toResponseDtoList(librarians);
     }
 
-    public UserInformation getLibrarianByUsername(String username) {
+    public UserInformationDto getLibrarianByUsername(String username) {
         UserInformation userInformation = userInformationRepository.findByUser_Username(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Librarian with username " + username + " not found."));
 
         if (!userInformation.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"))) {
             throw new ResourceNotFoundException("User with username " + username + " is not a librarian.");
         }
-        return userInformation;
+        return userInformationMapper.toResponseDto(userInformation);
     }
 
-    public UserInformation updateUserInformation(Long userInformationId, UserInformationInputDto userInformationInputDto) {
+    public UserInformationDto updateUserInformation(Long userInformationId, UserInformationInputDto userInformationInputDto) {
         UserInformation existingUserInfo = userInformationRepository.findById(userInformationId)
                 .orElseThrow(() -> new ResourceNotFoundException("User information not found with ID: " + userInformationId));
 
@@ -173,7 +186,7 @@ public class UserInformationService {
         }
 
         if (userInformationInputDto.password != null && !userInformationInputDto.password.isEmpty()) {
-            user.setPassword(userInformationInputDto.password); // GEEN passwordEncoder.encode() meer
+            user.setPassword(userInformationInputDto.password); // TODO: wachtwoord beveiligen
         }
 
         if (userInformationInputDto.roles != null) {
@@ -184,47 +197,81 @@ public class UserInformationService {
             user.setRoles(newRoles);
         }
 
-        return userInformationRepository.save(existingUserInfo);
+        UserInformation updatedUserInfo = userInformationRepository.save(existingUserInfo);
+        userRepository.save(user);
+
+        return userInformationMapper.toResponseDto(updatedUserInfo);
     }
 
-    public UserInformation patchUser(UserInformationInputDto userInformationInputDto, Long userId) {
-        UserInformation existingUser = userInformationRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+    public UserInformationDto patchUser(UserInformationPatchDto userInformationPatchDto, Long userId) {
+        UserInformation existingUserInformation = userInformationRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User information not found with ID: " + userId));
 
-        if (userInformationInputDto.lastName != null) {
-            existingUser.setLastName(userInformationInputDto.lastName);
+        User user = existingUserInformation.getUser();
+
+        if (userInformationPatchDto.firstName != null) {
+            existingUserInformation.setFirstName(userInformationPatchDto.firstName);
         }
-        if (userInformationInputDto.street != null) {
-            existingUser.setStreet(userInformationInputDto.street);
+        if (userInformationPatchDto.lastName != null) {
+            existingUserInformation.setLastName(userInformationPatchDto.lastName);
         }
-        if (userInformationInputDto.houseNumber != null) {
-            existingUser.setHouseNumber(userInformationInputDto.houseNumber);
+        if (userInformationPatchDto.street != null) {
+            existingUserInformation.setStreet(userInformationPatchDto.street);
         }
-        if (userInformationInputDto.postalCode != null) {
-            existingUser.setPostalCode(userInformationInputDto.postalCode);
+        if (userInformationPatchDto.houseNumber != null) {
+            existingUserInformation.setHouseNumber(userInformationPatchDto.houseNumber);
         }
-        if (userInformationInputDto.city != null) {
-            existingUser.setCity(userInformationInputDto.city);
+        if (userInformationPatchDto.postalCode != null) {
+            existingUserInformation.setPostalCode(userInformationPatchDto.postalCode);
         }
-        if (userInformationInputDto.phone != null) {
-            existingUser.setPhone(userInformationInputDto.phone);
+        if (userInformationPatchDto.city != null) {
+            existingUserInformation.setCity(userInformationPatchDto.city);
         }
-        if (userInformationInputDto.username != null) {
-            existingUser.getUser().setUsername(userInformationInputDto.username);
+        if (userInformationPatchDto.phone != null) {
+            existingUserInformation.setPhone(userInformationPatchDto.phone);
         }
-        //TODO: wachtwoord beveiligen
-        if (userInformationInputDto.password != null) {
-            existingUser.getUser().setPassword(userInformationInputDto.password);
+        if (userInformationPatchDto.email != null) {
+            existingUserInformation.setEmail(userInformationPatchDto.email);
         }
-        if (userInformationInputDto.email != null) {
-            existingUser.setEmail(userInformationInputDto.email);
+        if (userInformationPatchDto.profilePictureUrl != null) {
+            existingUserInformation.setProfilePictureUrl(userInformationPatchDto.profilePictureUrl);
         }
-        if (userInformationInputDto.profilePictureUrl != null) {
-            existingUser.setProfilePictureUrl(userInformationInputDto.profilePictureUrl);
+
+
+        if (userInformationPatchDto.username != null && !userInformationPatchDto.username.equals(user.getUsername())) {
+            if (userRepository.findByUsername(userInformationPatchDto.username).isPresent() &&
+                    !userRepository.findByUsername(userInformationPatchDto.username).get().getUserId().equals(user.getUserId())) {
+                throw new UsernameAlreadyExistsException("Username " + userInformationPatchDto.username + " already exists.");
+            }
+            user.setUsername(userInformationPatchDto.username);
         }
-        return this.userInformationRepository.save(existingUser);
+
+        if (userInformationPatchDto.password != null && !userInformationPatchDto.password.isEmpty()) {
+            user.setPassword(userInformationPatchDto.password);
+            // TODO: wachtwoord beveiligen
+        }
+
+        if (userInformationPatchDto.roles != null) {
+            Set<Role> newRoles = new HashSet<>();
+            for (String roleName : userInformationPatchDto.roles) {
+                roleRepository.findById("ROLE_" + roleName.toUpperCase()).ifPresent(newRoles::add);
+            }
+            user.setRoles(newRoles);
+        }
+
+        UserInformation patchedUserInformation = this.userInformationRepository.save(existingUserInformation);
+        userRepository.save(user);
+
+        return userInformationMapper.toResponseDto(patchedUserInformation);
     }
 
     public void deleteUser(Long userId) {
-        this.userInformationRepository.deleteById(userId);
+        UserInformation userInformationToDelete = userInformationRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User Information not found with ID: " + userId));
+
+        User userToDelete = userInformationToDelete.getUser();
+
+        userInformationRepository.delete(userInformationToDelete);
+        userRepository.delete(userToDelete);
     }
 }

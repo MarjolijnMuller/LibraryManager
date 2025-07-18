@@ -3,8 +3,7 @@ package org.example.librarymanager.controllers;
 import jakarta.validation.Valid;
 import org.example.librarymanager.dtos.UserInformationDto;
 import org.example.librarymanager.dtos.UserInformationInputDto;
-import org.example.librarymanager.mappers.UserInformationMapper;
-import org.example.librarymanager.models.UserInformation;
+import org.example.librarymanager.dtos.UserInformationPatchDto;
 import org.example.librarymanager.services.UserInformationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,99 +17,92 @@ import java.util.List;
 public class UserInformationController {
 
     private final UserInformationService userInformationService;
-    private final UserInformationMapper userInformationMapper;
 
-    public UserInformationController(UserInformationService userInformationService, UserInformationMapper userInformationMapper) {
+    public UserInformationController(UserInformationService userInformationService) {
         this.userInformationService = userInformationService;
-        this.userInformationMapper = userInformationMapper;
     }
 
     @PostMapping
-    public ResponseEntity<UserInformationDto> createUserInformation(@Valid @RequestBody UserInformationInputDto userInformationInputDto) {
-        UserInformation newUserInfo = this.userInformationService.createUser(userInformationInputDto);
-        UserInformationDto userInformationDto = userInformationMapper.toResponseDto(newUserInfo);
+    public ResponseEntity<UserInformationDto> createUser(@Valid @RequestBody UserInformationInputDto userInformationInputDto) {
+        UserInformationDto createdUserDto = userInformationService.createUser(userInformationInputDto);
 
         URI uri = URI.create(
                 ServletUriComponentsBuilder
                         .fromCurrentRequest()
-                        .path("/" + userInformationDto.userInformationId)
-                        .toUriString()
-        );
-        return ResponseEntity.created(uri).body(userInformationDto);
+                        .path("/" + createdUserDto.userInformationId)
+                        .toUriString());
+        return ResponseEntity.created(uri).body(createdUserDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserInformationDto> getUserInformationById(@PathVariable Long id) {
-        UserInformation userInformation = userInformationService.getUserById(id);
-        return ResponseEntity.ok(UserInformationMapper.toResponseDto(userInformation));
+    public ResponseEntity<UserInformationDto> getUserById(@PathVariable Long id) {
+        UserInformationDto userInformationDto = userInformationService.getUserById(id);
+        return ResponseEntity.ok(userInformationDto);
     }
 
     @GetMapping
     public ResponseEntity<List<UserInformationDto>> getAllUsers() {
-        UserInformation firstUser = userInformationService.getAllUsers();
-        return ResponseEntity.ok(List.of(UserInformationMapper.toResponseDto(firstUser)));
+        List<UserInformationDto> userInformations = userInformationService.getAllUsers();
+        return ResponseEntity.ok(userInformations);
     }
-
 
     @GetMapping("/username/{username}")
     public ResponseEntity<UserInformationDto> getUserByUsername(@PathVariable String username) {
-        UserInformation userInformation = userInformationService.getUserByUsername(username);
-        return ResponseEntity.ok(UserInformationMapper.toResponseDto(userInformation));
+        UserInformationDto userInformationDto = userInformationService.getUserByUsername(username);
+        return ResponseEntity.ok(userInformationDto);
     }
 
     @GetMapping("/members/{id}")
     public ResponseEntity<UserInformationDto> getMemberById(@PathVariable Long id) {
-        UserInformation userInformation = userInformationService.getMemberById(id);
-        return ResponseEntity.ok(UserInformationMapper.toResponseDto(userInformation));
+        UserInformationDto memberDto = userInformationService.getMemberById(id);
+        return ResponseEntity.ok(memberDto);
     }
 
     @GetMapping("/members")
     public ResponseEntity<List<UserInformationDto>> getAllMembers() {
-        List<UserInformation> userInformations = userInformationService.getAllMembers();
-        return ResponseEntity.ok(UserInformationMapper.toResponseDtoList(userInformations));
+        List<UserInformationDto> members = userInformationService.getAllMembers();
+        return ResponseEntity.ok(members);
     }
 
     @GetMapping("/members/username/{username}")
     public ResponseEntity<UserInformationDto> getMemberByUsername(@PathVariable String username) {
-        UserInformation userInformation = userInformationService.getMemberByUsername(username);
-        return ResponseEntity.ok(UserInformationMapper.toResponseDto(userInformation));
+        UserInformationDto member = userInformationService.getMemberByUsername(username);
+        return ResponseEntity.ok(member);
     }
 
     @GetMapping("/librarians/{id}")
     public ResponseEntity<UserInformationDto> getLibrarianById(@PathVariable Long id) {
-        UserInformation userInformation = userInformationService.getLibrarianById(id);
-        return ResponseEntity.ok(UserInformationMapper.toResponseDto(userInformation));
+        UserInformationDto librarian = userInformationService.getLibrarianById(id);
+        return ResponseEntity.ok(librarian);
     }
 
     @GetMapping("/librarians")
     public ResponseEntity<List<UserInformationDto>> getAllLibrarians() {
-        List<UserInformation> userInformations = userInformationService.getAllLibrarians();
-        return ResponseEntity.ok(UserInformationMapper.toResponseDtoList(userInformations));
+        List<UserInformationDto> librarians = userInformationService.getAllLibrarians();
+        return ResponseEntity.ok(librarians);
     }
 
     @GetMapping("/librarians/username/{username}")
     public ResponseEntity<UserInformationDto> getLibrarianByUsername(@PathVariable String username) {
-        UserInformation userInformation = userInformationService.getLibrarianByUsername(username);
-        return ResponseEntity.ok(UserInformationMapper.toResponseDto(userInformation));
+        UserInformationDto librarian = userInformationService.getLibrarianByUsername(username);
+        return ResponseEntity.ok(librarian);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserInformationDto> updateUserInformation(@Valid @PathVariable Long id, @RequestBody UserInformationInputDto userInformationInputDto) {
-        UserInformation updatedUserInfo = this.userInformationService.updateUserInformation(id, userInformationInputDto);
-        UserInformationDto userInformationDto = userInformationMapper.toResponseDto(updatedUserInfo);
-        return ResponseEntity.ok(userInformationDto);
+    public ResponseEntity<UserInformationDto> updateUserInformation(@PathVariable Long id, @Valid @RequestBody UserInformationInputDto userInformationInputDto) {
+        UserInformationDto updatedUser = userInformationService.updateUserInformation(id, userInformationInputDto);
+        return ResponseEntity.ok(updatedUser);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<UserInformationDto> patchUserInformation(@Valid @PathVariable Long id, @RequestBody UserInformationInputDto userInformationInputDto) {
-        UserInformation patchedUserInfo = this.userInformationService.patchUser(userInformationInputDto, id); // Note: service method parameter order
-        UserInformationDto userInformationDto = userInformationMapper.toResponseDto(patchedUserInfo);
-        return ResponseEntity.ok(userInformationDto);
+    public ResponseEntity<UserInformationDto> patchUser(@PathVariable Long id, @Valid @RequestBody UserInformationPatchDto userInformationPatchDto) {
+        UserInformationDto patchedUser = userInformationService.patchUser(userInformationPatchDto, id);
+        return ResponseEntity.ok(patchedUser);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        this.userInformationService.deleteUser(id);
+        userInformationService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 }

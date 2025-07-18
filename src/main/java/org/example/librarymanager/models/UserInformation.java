@@ -22,6 +22,7 @@ import java.util.List;
 public class UserInformation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_information_id")
     private long id;
 
     @NotNull
@@ -60,9 +61,6 @@ public class UserInformation {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "userId", unique = true, nullable = false)
     private User user;
-
-    @OneToMany(mappedBy = "userInformation", cascade = CascadeType.ALL)
-    private List<Loan> Loans = new ArrayList<>();
 
     public UserInformation(User user, String firstName, String lastName, String street, String houseNumber, String postalCode, String city, String phone, String email) {
         this.user = user;
