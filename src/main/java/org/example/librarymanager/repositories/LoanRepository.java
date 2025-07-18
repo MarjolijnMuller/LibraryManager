@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
-    List<Loan> findByMember(UserInformation member);
-    List<Loan> findByMemberUserId(Long userId);
+    List<Loan> findByUserInformation(UserInformation userInformation);
+    List<Loan> findByUserInformationUserId(Long userId);
 
     List<Loan> findByBookCopy(BookCopy bookCopy);
 

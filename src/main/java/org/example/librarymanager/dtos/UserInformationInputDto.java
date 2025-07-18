@@ -1,12 +1,22 @@
 package org.example.librarymanager.dtos;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public class MemberInputDto extends UserInputDto {
+import java.util.Set;
+
+public class UserInformationInputDto {
+    @NotNull
+    @Size(min = 5, max = 50)
+    public String username;
+
+    @NotNull
+    @Size(min = 5, max = 250)
+    public String password;
+
+    public Set<String> roles;
+
     @NotNull
     @Size(min = 3, max = 250)
     public String firstName;
@@ -27,5 +37,8 @@ public class MemberInputDto extends UserInputDto {
     @Size(min = 1, max = 100)
     public String city;
 
+    @Email
+    public String email;
     public String phone;
+    public String profilePictureUrl;
 }

@@ -2,9 +2,7 @@ package org.example.librarymanager.mappers;
 
 import org.example.librarymanager.dtos.InvoiceDto;
 import org.example.librarymanager.dtos.InvoiceInputDto;
-import org.example.librarymanager.dtos.LibrarianDto;
 import org.example.librarymanager.models.Invoice;
-import org.example.librarymanager.models.Librarian;
 import org.example.librarymanager.models.PaymentStatus;
 
 import java.util.List;

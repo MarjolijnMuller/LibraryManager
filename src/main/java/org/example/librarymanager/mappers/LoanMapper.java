@@ -3,6 +3,7 @@ package org.example.librarymanager.mappers;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.models.BookCopy;
+import org.example.librarymanager.models.Fine;
 import org.example.librarymanager.models.Loan;
 import org.example.librarymanager.models.UserInformation;
 
@@ -10,14 +11,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class LoanMapper {
-    //TODO: voeg Fine toe tussen de () en loan.setFine(null)
-    public static Loan toEntity(LoanInputDto loanInputDto, BookCopy bookCopy, UserInformation member) {
+    public static Loan toEntity(LoanInputDto loanInputDto, BookCopy bookCopy, UserInformation userInformation) {
         Loan loan = new Loan();
         loan.setLoanDate(loanInputDto.loanDate);
         loan.setReturnDate(loanInputDto.returnDate);
         loan.setReturned(false);
         loan.setBookCopy(bookCopy);
-        loan.setMember(member);
+        loan.setUserInformation(userInformation);
+        loan.setFines(null);
         return loan;
     }
 
@@ -31,10 +32,12 @@ public class LoanMapper {
         if (loan.getBookCopy() != null) {
             loanDto.bookCopyId = loan.getBookCopy().getBookCopyId();
         }
-        if (loan.getMember() != null) {
-            loanDto.userId = loan.getMember().getUserId();
+        if (loan.getUserInformation() != null) {
+            loanDto.userId = loan.getUserInformation().getUser().getUserId();
         }
-
+        if (loan.getFines() != null && !loan.getFines().isEmpty()) {
+            loanDto.fineId = loan.getFines().get(0).getFineId();
+        }
         return loanDto;
     }
 
