@@ -2,8 +2,7 @@ package org.example.librarymanager.repositories;
 
 import org.example.librarymanager.models.BookCopy;
 import org.example.librarymanager.models.Loan;
-import org.example.librarymanager.models.Member;
-import org.example.librarymanager.models.User;
+import org.example.librarymanager.models.UserInformation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -11,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
-    List<Loan> findByMember(Member member);
+    List<Loan> findByMember(UserInformation member);
     List<Loan> findByMemberUserId(Long userId);
 
     List<Loan> findByBookCopy(BookCopy bookCopy);

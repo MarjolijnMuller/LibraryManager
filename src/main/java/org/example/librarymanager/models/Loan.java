@@ -40,9 +40,8 @@ public class Loan {
     private BookCopy bookCopy;
 
     @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    @NotNull
-    private Member member;
+    @JoinColumn(name = "user_information_id")
+    private UserInformation userInformation;
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
     private List<Fine> fines = new ArrayList<>();

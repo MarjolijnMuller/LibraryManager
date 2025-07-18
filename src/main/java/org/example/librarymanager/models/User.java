@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -16,8 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,17 +30,27 @@ public abstract class User {
     @Size(min = 5, max = 50)
     private String username;
 
-    @Email
-    private String email;
 
     @NotNull
     @Column(nullable = false)
     @Size(min = 5, max = 250)
     private String password;
 
-    private String profilePictureUrl;
 
 
-    public abstract String getRole();
+    @ManyToMany(fetch = FetchType.EAGER)
+            @JoinTable(
+                    name = "user_roles",
+                    joinColumns = @JoinColumn(name = "user_id"),
+                    inverseJoinColumns = @JoinColumn(name = "rolename")
+            )
+    private Set<Role> roles = new HashSet<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private UserInformation userInformation;
+
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 }

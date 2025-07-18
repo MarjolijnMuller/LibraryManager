@@ -5,7 +5,7 @@ import org.example.librarymanager.dtos.MemberDto;
 import org.example.librarymanager.dtos.MemberInputDto;
 import org.example.librarymanager.dtos.UserInputDto;
 import org.example.librarymanager.mappers.MemberMapper;
-import org.example.librarymanager.models.Member;
+import org.example.librarymanager.models.UserInformation;
 import org.example.librarymanager.services.MemberService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class MemberController {
 
     @PostMapping
     public ResponseEntity<MemberDto> createMember(@Valid @RequestBody MemberInputDto memberInputDto, UserInputDto userInputDto) {
-        Member member = this.memberService.createMember(memberInputDto, userInputDto);
+        UserInformation member = this.memberService.createMember(memberInputDto, userInputDto);
         MemberDto memberDto = MemberMapper.toResponseDto(member);
 
         URI uri = URI.create(
@@ -38,7 +38,7 @@ public class MemberController {
 
     @GetMapping
     public ResponseEntity<List<MemberDto>> getAllMember() {
-        List<Member> allMembers = memberService.getAllMembers();
+        List<UserInformation> allMembers = memberService.getAllMembers();
         List<MemberDto> allMemberDtos = MemberMapper.toResponseDtoList(allMembers);
         return ResponseEntity.ok(allMemberDtos);
     }
@@ -80,14 +80,14 @@ public class MemberController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MemberDto> updateMember(@Valid @PathVariable Long id, @RequestBody MemberInputDto memberInputDto) {
-        Member member = this.memberService.updateMember(id, memberInputDto);
+        UserInformation member = this.memberService.updateMember(id, memberInputDto);
         MemberDto memberDto = MemberMapper.toResponseDto(member);
         return ResponseEntity.ok(memberDto);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<MemberDto> patchMember(@Valid @PathVariable Long id, @RequestBody MemberInputDto memberInputDto) {
-        Member member = this.memberService.patchMember(memberInputDto, id);
+        UserInformation member = this.memberService.patchMember(memberInputDto, id);
         MemberDto memberDto = MemberMapper.toResponseDto(member);
         return ResponseEntity.ok(memberDto);
     }

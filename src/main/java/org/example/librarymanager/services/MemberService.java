@@ -4,7 +4,7 @@ import org.example.librarymanager.dtos.MemberInputDto;
 import org.example.librarymanager.dtos.UserInputDto;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.MemberMapper;
-import org.example.librarymanager.models.Member;
+import org.example.librarymanager.models.UserInformation;
 import org.example.librarymanager.repositories.MemberRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,44 +18,44 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
-    public Member createMember(MemberInputDto memberInputDto, UserInputDto userInputDto) {
+    public UserInformation createMember(MemberInputDto memberInputDto, UserInputDto userInputDto) {
         return this.memberRepository.save(MemberMapper.toEntity(memberInputDto, userInputDto));
     }
 
-    public List<Member> getAllMembers() {
+    public List<UserInformation> getAllMembers() {
         return this.memberRepository.findAll();
     }
 
-    public Member getMemberById(Long userId) {
+    public UserInformation getMemberById(Long userId) {
         return this.memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
     }
 
-    public List<Member> getMemberByFirstName(String firstName) {
+    public List<UserInformation> getMemberByFirstName(String firstName) {
         return this.memberRepository.findByFirstName(firstName);
     }
 
-    public List<Member> getMemberByLastName(String lastName) {
+    public List<UserInformation> getMemberByLastName(String lastName) {
         return this.memberRepository.findByLastName(lastName);
     }
 
-    public List<Member> getMemberByFirstNameAndLastName(String firstName, String lastName) {
+    public List<UserInformation> getMemberByFirstNameAndLastName(String firstName, String lastName) {
         return this.memberRepository.findByFirstNameAndLastName(firstName, lastName);
     }
 
-    public List<Member> getMemberByEmail(String email) {
+    public List<UserInformation> getMemberByEmail(String email) {
         return this.memberRepository.findByEmail(email);
     }
 
-    public List<Member> getMemberByPostalCodeAndHouseNumber(String postalCode, String houseNumber) {
+    public List<UserInformation> getMemberByPostalCodeAndHouseNumber(String postalCode, String houseNumber) {
         return this.memberRepository.findByPostalCodeAndHouseNumber(postalCode, houseNumber);
     }
 
-    public Member getMemberByUsername(String username) {
+    public UserInformation getMemberByUsername(String username) {
         return this.memberRepository.findByUsername(username);
     }
 
-    public Member updateMember(Long userId, MemberInputDto memberInputDto) {
-        Member existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
+    public UserInformation updateMember(Long userId, MemberInputDto memberInputDto) {
+        UserInformation existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
 
         existingMember.setFirstName(memberInputDto.firstName);
         existingMember.setLastName(memberInputDto.lastName);
@@ -83,8 +83,8 @@ public class MemberService {
         return this.memberRepository.save(existingMember);
     }
 
-    public Member patchMember(MemberInputDto memberInputDto, Long userId) {
-        Member existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
+    public UserInformation patchMember(MemberInputDto memberInputDto, Long userId) {
+        UserInformation existingMember = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
 
         if (memberInputDto.lastName != null) {
             existingMember.setLastName(memberInputDto.lastName);

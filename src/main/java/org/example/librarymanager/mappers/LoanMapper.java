@@ -4,14 +4,14 @@ import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.models.BookCopy;
 import org.example.librarymanager.models.Loan;
-import org.example.librarymanager.models.Member;
+import org.example.librarymanager.models.UserInformation;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class LoanMapper {
     //TODO: voeg Fine toe tussen de () en loan.setFine(null)
-    public static Loan toEntity(LoanInputDto loanInputDto, BookCopy bookCopy, Member member) {
+    public static Loan toEntity(LoanInputDto loanInputDto, BookCopy bookCopy, UserInformation member) {
         Loan loan = new Loan();
         loan.setLoanDate(loanInputDto.loanDate);
         loan.setReturnDate(loanInputDto.returnDate);

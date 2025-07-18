@@ -33,7 +33,7 @@ public class LoanService {
         BookCopy bookCopy = bookCopyRepository.findById(loanInputDto.bookCopyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bookcopy not found with ID: " + loanInputDto.bookCopyId));
 
-        Member member = memberRepository.findById(loanInputDto.userId)
+        UserInformation member = memberRepository.findById(loanInputDto.userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + loanInputDto.userId));
 
         if (loanRepository.findByBookCopyAndIsReturnedFalse(bookCopy).isPresent()) {
@@ -57,7 +57,7 @@ public class LoanService {
     }
 
     public List<LoanDto> getLoansByMemberId(Long userId) {
-        Member member = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
+        UserInformation member = memberRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + userId));
         return LoanMapper.toResponseDtoList(loanRepository.findByMember(member));
 
     }
@@ -96,7 +96,7 @@ public class LoanService {
         BookCopy bookCopy = bookCopyRepository.findById(loanInputDto.bookCopyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Boekexemplaar niet gevonden met ID: " + loanInputDto.bookCopyId));
 
-        Member member = memberRepository.findById(loanInputDto.userId)
+        UserInformation member = memberRepository.findById(loanInputDto.userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lid niet gevonden met ID: " + loanInputDto.userId));
 
         existingLoan.setLoanDate(loanInputDto.loanDate);
@@ -130,7 +130,7 @@ public class LoanService {
         }
 
         if (loanPatchDto.userId != null) {
-            Member member = memberRepository.findById(loanPatchDto.userId)
+            UserInformation member = memberRepository.findById(loanPatchDto.userId)
                     .orElseThrow(() -> new ResourceNotFoundException("Member not found with ID: " + loanPatchDto.userId));
             existingLoan.setMember(member);
         }

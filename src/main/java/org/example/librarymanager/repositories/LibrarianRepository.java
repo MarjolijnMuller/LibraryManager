@@ -1,7 +1,6 @@
 package org.example.librarymanager.repositories;
 
 import org.example.librarymanager.models.Librarian;
-import org.example.librarymanager.models.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

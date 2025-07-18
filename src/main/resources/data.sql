@@ -1,51 +1,20 @@
+insert into roles(rolename)
+values ('ROLE_MEMBER'),
+       ('ROLE_LIBRARIAN')
+
 insert into books(title,
-                  author_first_name,
-                  author_last_name,
-                  isbn,
-                  publisher,
-                  category)
-values ('The Hitchhiker''s Guide to the Galaxy',
-        'Douglas',
-        'Adams',
-        '9780345391803',
-        'Del Rey',
-        'FICTION'),
-       ('The Name of the Wind',
-        'Patrick',
-        'Rothfuss',
-        '9780756404741',
-        'DAW Books',
-        'FICTION'),
-       ('Thinking, Fast and Slow',
-        'Daniel',
-        'Kahneman',
-        '9780374533557',
-        'Farrar, Straus and Giroux',
-        'NON_FICTION'),
-       ('The Gruffalo',
-        'Julia',
-        'Donaldson',
-        '9780333905581',
-        'Macmillan Children''s Books',
-        'CHILDRENS_BOOK'),
-       ('Where the Crawdads Sing',
-        'Delia',
-        'Owens',
-        '9780735219090',
-        'G.P. Putnam''s Sons',
-        'ADULTS_BOOK'),
-       ('Cosmos',
-        'Carl',
-        'Sagan',
-        '9780345539434',
-        'Ballantine Books',
-        'SCIENCE'),
-       ('A People''s History of the United States',
-        'Howard',
-        'Zinn',
-        '9780060528379',
-        'Harper Perennial',
-        'HISTORY');
+           author_first_name,
+           author_last_name,
+           isbn,
+           publisher,
+           category)
+values ('The Hitchhiker''s Guide to the Galaxy', 'Douglas', 'Adams', '9780345391803', 'Del Rey', 'FICTION'),
+    ('The Name of the Wind', 'Patrick', 'Rothfuss', '9780756404741', 'DAW Books', 'FICTION'),
+    ('Thinking, Fast and Slow', 'Daniel', 'Kahneman', '9780374533557', 'Farrar, Straus and Giroux', 'NON_FICTION'),
+    ('The Gruffalo', 'Julia', 'Donaldson', '9780333905581', 'Macmillan Children''s Books', 'CHILDRENS_BOOK'),
+    ('Where the Crawdads Sing', 'Delia', 'Owens', '9780735219090', 'G.P. Putnam''s Sons', 'ADULTS_BOOK'),
+    ('Cosmos', 'Carl', 'Sagan', '9780345539434', 'Ballantine Books', 'SCIENCE'),
+    ('A People''s History of the United States', 'Howard', 'Zinn', '9780060528379', 'Harper Perennial', 'HISTORY');
 
 insert into book_copies(book_id, follow_number, status)
 values (1, 1, 'AVAILABLE'),
@@ -107,17 +76,15 @@ VALUES ('2024-01-15', 'Januari 2024', 25.50, 'PAID'),
        ('2024-06-12', 'Juni 2024', 5.25, 'OVERDUE');
 
 INSERT INTO loans (loan_date, return_date, is_returned, book_copy_id, user_id)
-VALUES
-    ('2025-06-20', '2025-07-04', TRUE, 1, 201),
-    ('2025-07-01', '2025-07-15', FALSE, 3, 202),
-    ('2025-07-05', '2025-07-19', FALSE, 5, 203),
-    ('2025-05-10', '2025-05-24', TRUE, 9, 204),
-    ('2025-07-08', '2025-07-22', FALSE, 11, 205);
+VALUES ('2025-06-20', '2025-07-04', TRUE, 1, 201),
+       ('2025-07-01', '2025-07-15', FALSE, 3, 202),
+       ('2025-07-05', '2025-07-19', FALSE, 5, 203),
+       ('2025-05-10', '2025-05-24', TRUE, 9, 204),
+       ('2025-07-08', '2025-07-22', FALSE, 11, 205);
 
 INSERT INTO fines (fine_amount, fine_date, is_paid, loan_id, invoice_id)
-VALUES
-    (2.50, '2025-07-05', FALSE, 1, 1),
-    (10.00, '2025-07-01', TRUE, 1, 1),
-    (7.75, '2025-07-07', FALSE, 1, 4),
-    (3.00, '2025-07-06', FALSE, 4, 3),
-    (1.25, '2025-07-08', FALSE, 5, 5);
+VALUES (2.50, '2025-07-05', FALSE, 1, 1),
+       (10.00, '2025-07-01', TRUE, 1, 1),
+       (7.75, '2025-07-07', FALSE, 1, 4),
+       (3.00, '2025-07-06', FALSE, 4, 3),
+       (1.25, '2025-07-08', FALSE, 5, 5);
