@@ -3,10 +3,18 @@ package org.example.librarymanager.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "librarians")
 @PrimaryKeyJoinColumn(name = "userId", referencedColumnName = "userId")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 
 public class Librarian extends User {
 
@@ -20,27 +28,9 @@ public class Librarian extends User {
     private String lastName;
 
 
-    public Librarian() {
-    }
-
     @Override
     public String getRole() {
         return "Librarian";
     }
 
-    public @NotNull String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(@NotNull String firstName) {
-        this.firstName = firstName;
-    }
-
-    public @NotNull String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(@NotNull String lastName) {
-        this.lastName = lastName;
-    }
 }

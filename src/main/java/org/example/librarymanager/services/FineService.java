@@ -67,7 +67,7 @@ public class FineService {
             throw new IllegalArgumentException("Fine already paid");
         }
 
-        fine.setPaid(true);
+        fine.setIsPaid(true);
         return FineMapper.toResponseDto(fineRepository.save(fine));
     }
 

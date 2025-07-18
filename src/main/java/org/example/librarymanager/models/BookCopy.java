@@ -1,9 +1,18 @@
 package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "bookCopies")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+
 public class BookCopy {
 
     @Id
@@ -25,33 +34,6 @@ public class BookCopy {
         this.followNumber = followNumber;
         this.status = status;
         this.book = book;
-    }
-
-    public BookCopy() {
-    }
-
-    public Long getBookCopyId() {
-        return bookCopyId;
-    }
-
-    public Long getFollowNumber() {
-        return followNumber;
-    }
-
-    public void setFollowNumber(Long followNumber) {
-        this.followNumber = followNumber;
-    }
-
-    public BookCopyStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(BookCopyStatus status) {
-        this.status = status;
-    }
-
-    public Book getBook() {
-        return book;
     }
 
     public void setBook(Book book) {

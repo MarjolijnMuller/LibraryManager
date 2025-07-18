@@ -3,11 +3,19 @@ package org.example.librarymanager.models;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name="fines")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Fine {
 
     @Id
@@ -51,54 +59,12 @@ public class Fine {
         this.invoice = null;
     }
 
-    public Fine() {}
-
-    public long getFineId() {
-        return fineId;
-    }
-
-    public void setFineId(long fineId) {
-        this.fineId = fineId;
-    }
-
-    public @NotNull @PositiveOrZero Double getFineAmount() {
-        return fineAmount;
-    }
-
-    public void setFineAmount(@NotNull @PositiveOrZero Double fineAmount) {
-        this.fineAmount = fineAmount;
-    }
-
-    public @NotNull LocalDate getFineDate() {
-        return fineDate;
-    }
-
-    public void setFineDate(@NotNull LocalDate fineDate) {
-        this.fineDate = fineDate;
-    }
-
     public Boolean isPaid() {
         return isPaid;
     }
 
     public void setPaid(Boolean paid) {
         isPaid = paid;
-    }
-
-    public @NotNull Loan getLoan() {
-        return loan;
-    }
-
-    public void setLoan(@NotNull Loan loan) {
-        this.loan = loan;
-    }
-
-    public Invoice getInvoice() {
-        return invoice;
-    }
-
-    public void setInvoice(Invoice invoice) {
-        this.invoice = invoice;
     }
 
 

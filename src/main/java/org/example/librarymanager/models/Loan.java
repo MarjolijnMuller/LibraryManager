@@ -2,6 +2,10 @@ package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -9,6 +13,10 @@ import java.util.List;
 
 @Entity
 @Table(name="loans")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Loan {
 
     @Id
@@ -29,49 +37,16 @@ public class Loan {
     @ManyToOne
     @JoinColumn(name = "book_copy_id", nullable = false)
     @NotNull
-        private BookCopy bookCopy;
+    private BookCopy bookCopy;
 
     @ManyToOne
-    @JoinColumn(name="userId", nullable = false)
+    @JoinColumn(name = "userId", nullable = false)
     @NotNull
     private Member member;
 
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
     private List<Fine> fines = new ArrayList<>();
 
-    public Loan(LocalDate loanDate, LocalDate returnDate, Boolean isReturned, BookCopy bookCopy, Member member) {
-        this.loanDate = loanDate;
-        this.returnDate = returnDate;
-        this.isReturned = isReturned;
-        this.bookCopy = bookCopy;
-        this.member = member;
-    }
-
-    public Loan() {}
-
-    public Long getLoanId() {
-        return loanId;
-    }
-
-    public void setLoanId(Long loanId) {
-        this.loanId = loanId;
-    }
-
-    public @NotNull LocalDate getLoanDate() {
-        return loanDate;
-    }
-
-    public void setLoanDate(@NotNull LocalDate loanDate) {
-        this.loanDate = loanDate;
-    }
-
-    public LocalDate getReturnDate() {
-        return returnDate;
-    }
-
-    public void setReturnDate(LocalDate returnDate) {
-        this.returnDate = returnDate;
-    }
 
     public Boolean isReturned() {
         return isReturned;
@@ -79,21 +54,6 @@ public class Loan {
 
     public void setReturned(Boolean returned) {
         isReturned = returned;
-    }
 
-    public @NotNull BookCopy getBookCopy() {
-        return bookCopy;
-    }
-
-    public void setBookCopy(@NotNull BookCopy bookCopy) {
-        this.bookCopy = bookCopy;
-    }
-
-    public @NotNull Member getMember() {
-        return member;
-    }
-
-    public void setMember(@NotNull Member member) {
-        this.member = member;
     }
 }
