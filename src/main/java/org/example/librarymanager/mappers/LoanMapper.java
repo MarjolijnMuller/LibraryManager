@@ -2,22 +2,21 @@ package org.example.librarymanager.mappers;
 
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
-import org.example.librarymanager.models.BookCopy;
-import org.example.librarymanager.models.Loan;
-import org.example.librarymanager.models.Member;
+import org.example.librarymanager.models.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class LoanMapper {
-    //TODO: voeg Fine toe tussen de () en loan.setFine(null)
-    public static Loan toEntity(LoanInputDto loanInputDto, BookCopy bookCopy, Member member) {
+    public static Loan toEntity(LoanInputDto loanInputDto, BookCopy bookCopy, User user) {
         Loan loan = new Loan();
         loan.setLoanDate(loanInputDto.loanDate);
         loan.setReturnDate(loanInputDto.returnDate);
         loan.setReturned(false);
         loan.setBookCopy(bookCopy);
-        loan.setMember(member);
+        loan.setUser(user);
+        loan.setFines(null);
         return loan;
     }
 
@@ -31,9 +30,14 @@ public class LoanMapper {
         if (loan.getBookCopy() != null) {
             loanDto.bookCopyId = loan.getBookCopy().getBookCopyId();
         }
-        if (loan.getMember() != null) {
-            loanDto.userId = loan.getMember().getUserId();
+        if (loan.getUser() != null) {
+            loanDto.userId = loan.getUser().getUserId();
         }
+        if (loan.getFines() != null && !loan.getFines().isEmpty()) {
+            loanDto.fineId = loan.getFines().get(0).getFineId();
+        }
+
+        loanDto.status = determineLoanStatus(loan);
 
         return loanDto;
     }
@@ -42,5 +46,17 @@ public class LoanMapper {
         return loans.stream()
                 .map(LoanMapper::toResponseDto)
                 .collect(Collectors.toList());
+    }
+
+    private static String determineLoanStatus(Loan loan) {
+        if (loan.isReturned()) {
+            return "Returned";
+        } else {
+            if (loan.getReturnDate() != null && loan.getReturnDate().isBefore(LocalDate.now())) {
+                return "Overdue";
+            } else {
+                return "Outstanding";
+            }
+        }
     }
 }

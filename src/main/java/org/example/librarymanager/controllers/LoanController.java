@@ -4,8 +4,6 @@ import jakarta.validation.Valid;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.dtos.LoanPatchDto;
-import org.example.librarymanager.mappers.LoanMapper;
-import org.example.librarymanager.models.Loan;
 import org.example.librarymanager.services.LoanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,13 +45,29 @@ public class LoanController {
         return ResponseEntity.ok(loan);
     }
 
-    @GetMapping("/member/{userId}")
-    public ResponseEntity<List<LoanDto>> getLoansByMember(@PathVariable Long userId) {
-        List<LoanDto> loans = loanService.getLoansByMemberId(userId);
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<LoanDto>> getLoansByUser(@PathVariable Long userId) {
+        List<LoanDto> loans = loanService.getLoansByUserId(userId);
         return ResponseEntity.ok(loans);
     }
-    //TODO: nog meer get-requests?
 
+    @GetMapping("/bookcopy/{bookCopyId}")
+    public ResponseEntity<List<LoanDto>> getLoansByBookCopy(@PathVariable Long bookCopyId) {
+        List<LoanDto> loans = loanService.getLoansByBookCopyId(bookCopyId);
+        return ResponseEntity.ok(loans);
+    }
+
+    @GetMapping("/overdue")
+    public ResponseEntity<List<LoanDto>> getOverdueLoans() {
+        List<LoanDto> loans = loanService.getOverdueLoans();
+        return ResponseEntity.ok(loans);
+    }
+
+    @GetMapping("/outstanding")
+    public ResponseEntity<List<LoanDto>> getOutstandingLoans() {
+        List<LoanDto> loans = loanService.getOutstandingLoans();
+        return ResponseEntity.ok(loans);
+    }
 
 
     @PutMapping("/{loanId}")
@@ -71,8 +85,7 @@ public class LoanController {
     @PatchMapping("/{loanId}")
     public ResponseEntity<LoanDto> patchLoan(
             @PathVariable Long loanId,
-            @Valid @RequestBody LoanPatchDto loanPatchDto) { // Use LoanPatchDto here!
-
+            @Valid @RequestBody LoanPatchDto loanPatchDto) {
         LoanDto updatedLoan = loanService.patchLoan(loanId, loanPatchDto);
         return ResponseEntity.ok(updatedLoan);
     }

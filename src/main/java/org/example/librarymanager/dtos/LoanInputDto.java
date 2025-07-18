@@ -11,7 +11,7 @@ public class LoanInputDto {
     @NotNull
     public LocalDate returnDate;
     @NotNull
-    public Boolean isReturned;
+    public Boolean isReturned = false;
     @NotNull
     public Long bookCopyId;
     @NotNull
