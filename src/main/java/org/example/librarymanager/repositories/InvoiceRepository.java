@@ -17,6 +17,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     @Query("SELECT i FROM Invoice i WHERE i.invoiceDate BETWEEN ?1 AND ?2 ORDER BY i.invoiceDate ASC")
     List<Invoice> findInvoicesByDateRangeSorted(LocalDate startDate, LocalDate endDate);
 
-    List<Invoice> findByInvoicePeriod(String invoicePeriod);
+    List<Invoice> findByInvoicePeriodIgnoreCase(String invoicePeriod);
     List<Invoice> findByPaymentStatus(PaymentStatus paymentStatus);
 }

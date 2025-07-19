@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserInformationRepository extends JpaRepository<UserInformation, Long> {
-    List<UserInformation> findByFirstName(String firstName);
-    List<UserInformation> findByLastName(String lastName);
-    List<UserInformation> findByFirstNameAndLastName(String firstName, String lastName);
-    List<UserInformation> findByEmail(String email);
-    List<UserInformation> findByPostalCodeAndHouseNumber(String postalCode, String houseNumber);
+    List<UserInformation> findByFirstNameIgnoreCase(String firstName);
+    List<UserInformation> findByLastNameIgnoreCase(String lastName);
+    List<UserInformation> findByFirstNameAndLastNameIgnoreCase(String firstName, String lastName);
+    List<UserInformation> findByEmailIgnoreCase(String email);
+    List<UserInformation> findByPostalCodeAndHouseNumberIgnoreCase(String postalCode, String houseNumber);
 
-    Optional<UserInformation> findByUser_Username(String username);
+    Optional<UserInformation> findByUser_UsernameIgnoreCase(String username);
 }

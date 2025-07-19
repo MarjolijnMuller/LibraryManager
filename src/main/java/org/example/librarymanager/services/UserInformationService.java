@@ -98,7 +98,7 @@ public class UserInformationService {
     }
 
     public UserInformationDto getUserByUsername(String username) {
-        UserInformation userInformation = userInformationRepository.findByUser_Username(username).orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
+        UserInformation userInformation = userInformationRepository.findByUser_UsernameIgnoreCase(username).orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
         return userInformationMapper.toResponseDto(userInformation);
     }
 
@@ -119,7 +119,7 @@ public class UserInformationService {
     }
 
     public UserInformationDto getMemberByUsername(String username) {
-        UserInformation userInformation = userInformationRepository.findByUser_Username(username)
+        UserInformation userInformation = userInformationRepository.findByUser_UsernameIgnoreCase(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Member with username " + username + " not found."));
 
         if (!userInformation.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER"))) {
@@ -145,7 +145,7 @@ public class UserInformationService {
     }
 
     public UserInformationDto getLibrarianByUsername(String username) {
-        UserInformation userInformation = userInformationRepository.findByUser_Username(username)
+        UserInformation userInformation = userInformationRepository.findByUser_UsernameIgnoreCase(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Librarian with username " + username + " not found."));
 
         if (!userInformation.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"))) {
@@ -154,11 +154,15 @@ public class UserInformationService {
         return userInformationMapper.toResponseDto(userInformation);
     }
 
-    public UserInformationDto updateUserInformation(Long userInformationId, UserInformationInputDto userInformationInputDto) {
-        UserInformation existingUserInfo = userInformationRepository.findById(userInformationId)
-                .orElseThrow(() -> new ResourceNotFoundException("User information not found with ID: " + userInformationId));
+    public UserInformationDto updateUserInformation(Long userId, UserInformationInputDto userInformationInputDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-        User user = existingUserInfo.getUser();
+        UserInformation existingUserInfo = user.getUserInformation();
+
+        if (existingUserInfo == null) {
+            throw new ResourceNotFoundException("User information not found for User with ID: " + userId);
+        }
 
         existingUserInfo.setFirstName(userInformationInputDto.firstName);
         existingUserInfo.setLastName(userInformationInputDto.lastName);
@@ -186,7 +190,8 @@ public class UserInformationService {
         }
 
         if (userInformationInputDto.password != null && !userInformationInputDto.password.isEmpty()) {
-            user.setPassword(userInformationInputDto.password); // TODO: wachtwoord beveiligen
+            user.setPassword(userInformationInputDto.password);
+            // TODO: wachtwoord beveiligen
         }
 
         if (userInformationInputDto.roles != null) {
@@ -204,56 +209,59 @@ public class UserInformationService {
     }
 
     public UserInformationDto patchUser(UserInformationPatchDto userInformationPatchDto, Long userId) {
-        UserInformation existingUserInformation = userInformationRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User information not found with ID: " + userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-        User user = existingUserInformation.getUser();
+        UserInformation existingUserInformation = user.getUserInformation();
 
-        if (userInformationPatchDto.firstName != null) {
-            existingUserInformation.setFirstName(userInformationPatchDto.firstName);
-        }
-        if (userInformationPatchDto.lastName != null) {
-            existingUserInformation.setLastName(userInformationPatchDto.lastName);
-        }
-        if (userInformationPatchDto.street != null) {
-            existingUserInformation.setStreet(userInformationPatchDto.street);
-        }
-        if (userInformationPatchDto.houseNumber != null) {
-            existingUserInformation.setHouseNumber(userInformationPatchDto.houseNumber);
-        }
-        if (userInformationPatchDto.postalCode != null) {
-            existingUserInformation.setPostalCode(userInformationPatchDto.postalCode);
-        }
-        if (userInformationPatchDto.city != null) {
-            existingUserInformation.setCity(userInformationPatchDto.city);
-        }
-        if (userInformationPatchDto.phone != null) {
-            existingUserInformation.setPhone(userInformationPatchDto.phone);
-        }
-        if (userInformationPatchDto.email != null) {
-            existingUserInformation.setEmail(userInformationPatchDto.email);
-        }
-        if (userInformationPatchDto.profilePictureUrl != null) {
-            existingUserInformation.setProfilePictureUrl(userInformationPatchDto.profilePictureUrl);
+        if (existingUserInformation == null) {
+            throw new ResourceNotFoundException("User Information not found for User with ID: " + userId);
         }
 
+        if (userInformationPatchDto.getFirstName() != null) {
+            existingUserInformation.setFirstName(userInformationPatchDto.getFirstName());
+        }
+        if (userInformationPatchDto.getLastName() != null) {
+            existingUserInformation.setLastName(userInformationPatchDto.getLastName());
+        }
+        if (userInformationPatchDto.getStreet() != null) {
+            existingUserInformation.setStreet(userInformationPatchDto.getStreet());
+        }
+        if (userInformationPatchDto.getHouseNumber() != null) {
+            existingUserInformation.setHouseNumber(userInformationPatchDto.getHouseNumber());
+        }
+        if (userInformationPatchDto.getPostalCode() != null) {
+            existingUserInformation.setPostalCode(userInformationPatchDto.getPostalCode());
+        }
+        if (userInformationPatchDto.getCity() != null) {
+            existingUserInformation.setCity(userInformationPatchDto.getCity());
+        }
+        if (userInformationPatchDto.getPhone() != null) {
+            existingUserInformation.setPhone(userInformationPatchDto.getPhone());
+        }
+        if (userInformationPatchDto.getEmail() != null) {
+            existingUserInformation.setEmail(userInformationPatchDto.getEmail());
+        }
+        if (userInformationPatchDto.getProfilePictureUrl() != null) {
+            existingUserInformation.setProfilePictureUrl(userInformationPatchDto.getProfilePictureUrl());
+        }
 
-        if (userInformationPatchDto.username != null && !userInformationPatchDto.username.equals(user.getUsername())) {
-            if (userRepository.findByUsername(userInformationPatchDto.username).isPresent() &&
-                    !userRepository.findByUsername(userInformationPatchDto.username).get().getUserId().equals(user.getUserId())) {
-                throw new UsernameAlreadyExistsException("Username " + userInformationPatchDto.username + " already exists.");
+        if (userInformationPatchDto.getUsername() != null && !userInformationPatchDto.getUsername().equals(user.getUsername())) {
+            if (userRepository.findByUsername(userInformationPatchDto.getUsername()).isPresent() &&
+                    !userRepository.findByUsername(userInformationPatchDto.getUsername()).get().getUserId().equals(user.getUserId())) {
+                throw new UsernameAlreadyExistsException("Username " + userInformationPatchDto.getUsername() + " already exists.");
             }
-            user.setUsername(userInformationPatchDto.username);
+            user.setUsername(userInformationPatchDto.getUsername());
         }
 
-        if (userInformationPatchDto.password != null && !userInformationPatchDto.password.isEmpty()) {
-            user.setPassword(userInformationPatchDto.password);
-            // TODO: wachtwoord beveiligen
+        if (userInformationPatchDto.getPassword() != null && !userInformationPatchDto.getPassword().isEmpty()) {
+            user.setPassword(userInformationPatchDto.getPassword());
+            // TODO: wachtwoord beveiligen (bijvoorbeeld met BCryptPasswordEncoder)
         }
 
-        if (userInformationPatchDto.roles != null) {
+        if (userInformationPatchDto.getRoles() != null) {
             Set<Role> newRoles = new HashSet<>();
-            for (String roleName : userInformationPatchDto.roles) {
+            for (String roleName : userInformationPatchDto.getRoles()) {
                 roleRepository.findById("ROLE_" + roleName.toUpperCase()).ifPresent(newRoles::add);
             }
             user.setRoles(newRoles);
@@ -266,12 +274,9 @@ public class UserInformationService {
     }
 
     public void deleteUser(Long userId) {
-        UserInformation userInformationToDelete = userInformationRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User Information not found with ID: " + userId));
+        User userToDelete = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
 
-        User userToDelete = userInformationToDelete.getUser();
-
-        userInformationRepository.delete(userInformationToDelete);
         userRepository.delete(userToDelete);
     }
 }

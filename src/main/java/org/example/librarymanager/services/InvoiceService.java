@@ -49,7 +49,7 @@ public class InvoiceService {
     }
 
     public List<Invoice> getInvoicesByInvoicePeriod(String invoicePeriod){
-        return this.invoiceRepository.findByInvoicePeriod(invoicePeriod);
+        return this.invoiceRepository.findByInvoicePeriodIgnoreCase(invoicePeriod);
     }
 
     public List<Invoice> getInvoicesByPaymentStatus(PaymentStatus paymentStatus){

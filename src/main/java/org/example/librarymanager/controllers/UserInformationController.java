@@ -34,9 +34,9 @@ public class UserInformationController {
         return ResponseEntity.created(uri).body(createdUserDto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserInformationDto> getUserById(@PathVariable Long id) {
-        UserInformationDto userInformationDto = userInformationService.getUserById(id);
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserInformationDto> getUserById(@PathVariable Long userId) {
+        UserInformationDto userInformationDto = userInformationService.getUserById(userId);
         return ResponseEntity.ok(userInformationDto);
     }
 
@@ -52,9 +52,9 @@ public class UserInformationController {
         return ResponseEntity.ok(userInformationDto);
     }
 
-    @GetMapping("/members/{id}")
-    public ResponseEntity<UserInformationDto> getMemberById(@PathVariable Long id) {
-        UserInformationDto memberDto = userInformationService.getMemberById(id);
+    @GetMapping("/members/{userId}")
+    public ResponseEntity<UserInformationDto> getMemberById(@PathVariable Long userId) {
+        UserInformationDto memberDto = userInformationService.getMemberById(userId);
         return ResponseEntity.ok(memberDto);
     }
 
@@ -70,9 +70,9 @@ public class UserInformationController {
         return ResponseEntity.ok(member);
     }
 
-    @GetMapping("/librarians/{id}")
-    public ResponseEntity<UserInformationDto> getLibrarianById(@PathVariable Long id) {
-        UserInformationDto librarian = userInformationService.getLibrarianById(id);
+    @GetMapping("/librarians/{userId}")
+    public ResponseEntity<UserInformationDto> getLibrarianById(@PathVariable Long userId) {
+        UserInformationDto librarian = userInformationService.getLibrarianById(userId);
         return ResponseEntity.ok(librarian);
     }
 
@@ -88,21 +88,21 @@ public class UserInformationController {
         return ResponseEntity.ok(librarian);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserInformationDto> updateUserInformation(@PathVariable Long id, @Valid @RequestBody UserInformationInputDto userInformationInputDto) {
-        UserInformationDto updatedUser = userInformationService.updateUserInformation(id, userInformationInputDto);
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserInformationDto> updateUserInformation(@PathVariable Long userId, @Valid @RequestBody UserInformationInputDto userInformationInputDto) {
+        UserInformationDto updatedUser = userInformationService.updateUserInformation(userId, userInformationInputDto);
         return ResponseEntity.ok(updatedUser);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<UserInformationDto> patchUser(@PathVariable Long id, @Valid @RequestBody UserInformationPatchDto userInformationPatchDto) {
-        UserInformationDto patchedUser = userInformationService.patchUser(userInformationPatchDto, id);
+    @PatchMapping("/{userId}")
+    public ResponseEntity<UserInformationDto> patchUser(@PathVariable Long userId, @Valid @RequestBody UserInformationPatchDto userInformationPatchDto) {
+        UserInformationDto patchedUser = userInformationService.patchUser(userInformationPatchDto, userId);
         return ResponseEntity.ok(patchedUser);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userInformationService.deleteUser(id);
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        userInformationService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 }

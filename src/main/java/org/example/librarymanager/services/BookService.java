@@ -31,11 +31,11 @@ public class BookService {
     }
 
     public List<Book> getBooksByTitle(String title) {
-        return this.bookRepository.findBookByTitle(title);
+        return this.bookRepository.findBookByTitleIgnoreCase(title);
     }
 
     public List<Book> getBooksByAuthorLastName(String authorLastName) {
-        return this.bookRepository.findBooksByAuthorLastName(authorLastName);
+        return this.bookRepository.findBooksByAuthorLastNameIgnoreCase(authorLastName);
     }
 
     public Book getBookByISBN(String isbn) {

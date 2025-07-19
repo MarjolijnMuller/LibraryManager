@@ -17,6 +17,7 @@ public class FineInputDto {
 
     @NotNull
     public Long loanId;
+
     @NotNull
     public Long invoiceId;
 }
