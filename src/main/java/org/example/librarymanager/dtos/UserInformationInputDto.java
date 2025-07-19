@@ -20,6 +20,7 @@ public class UserInformationInputDto {
     @NotNull
     @Size(min = 3, max = 250)
     public String firstName;
+
     @NotNull
     @Size(min = 3, max = 250)
     public String lastName;
@@ -27,18 +28,23 @@ public class UserInformationInputDto {
     @NotNull
     @Size(min = 1, max = 250)
     public String street;
+
     @NotNull
     @Size(min=1)
     public String houseNumber;
+
     @NotNull
     @Size(min = 3, max = 100)
     public String postalCode;
+
     @NotNull
     @Size(min = 1, max = 100)
     public String city;
 
     @Email
     public String email;
+
     public String phone;
+
     public String profilePictureUrl;
 }
