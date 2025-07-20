@@ -2,7 +2,6 @@ package org.example.librarymanager.mappers;
 
 import org.example.librarymanager.dtos.FineDto;
 import org.example.librarymanager.dtos.FineInputDto;
-import org.example.librarymanager.dtos.InvoiceInputDto;
 import org.example.librarymanager.models.Fine;
 import org.example.librarymanager.models.Invoice;
 import org.example.librarymanager.models.Loan;
@@ -15,7 +14,7 @@ public class FineMapper {
         Fine fine = new Fine();
         fine.setFineAmount(fineInputDto.fineAmount);
         fine.setFineDate(fineInputDto.fineDate);
-        fine.setPaid(fineInputDto.isPaid);
+        fine.setIsPaid(fineInputDto.isPaid);
         fine.setLoan(loan);
         fine.setInvoice(invoice);
         return fine;
@@ -26,7 +25,8 @@ public class FineMapper {
         fineDto.fineId = fine.getFineId();
         fineDto.fineAmount = fine.getFineAmount();
         fineDto.fineDate = fine.getFineDate();
-        fineDto.isPaid = fine.isPaid();
+        fineDto.isPaid = fine.getIsPaid();
+        fineDto.isReadyForInvoice = fine.getIsReadyForInvoice();
 
         if (fine.getLoan() != null) {
             fineDto.loanId = fine.getLoan().getLoanId();

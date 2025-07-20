@@ -13,7 +13,7 @@ public class LoanMapper {
         Loan loan = new Loan();
         loan.setLoanDate(loanInputDto.loanDate);
         loan.setReturnDate(loanInputDto.returnDate);
-        loan.setReturned(false);
+        loan.setIsReturned(false);
         loan.setBookCopy(bookCopy);
         loan.setUser(user);
         loan.setFines(null);
@@ -25,7 +25,8 @@ public class LoanMapper {
         loanDto.loanId = loan.getLoanId();
         loanDto.loanDate = loan.getLoanDate();
         loanDto.returnDate = loan.getReturnDate();
-        loanDto.isReturned = loan.isReturned();
+        loanDto.isReturned = loan.getIsReturned();
+        loanDto.actualReturnDate = loan.getActualReturnDate();
 
         if (loan.getBookCopy() != null) {
             loanDto.bookCopyId = loan.getBookCopy().getBookCopyId();
@@ -34,6 +35,7 @@ public class LoanMapper {
             loanDto.userId = loan.getUser().getUserId();
         }
         if (loan.getFines() != null && !loan.getFines().isEmpty()) {
+            //TODO: lijst met fines
             loanDto.fineId = loan.getFines().get(0).getFineId();
         }
 
@@ -49,7 +51,7 @@ public class LoanMapper {
     }
 
     private static String determineLoanStatus(Loan loan) {
-        if (loan.isReturned()) {
+        if (loan.getIsReturned()) {
             return "Returned";
         } else {
             if (loan.getReturnDate() != null && loan.getReturnDate().isBefore(LocalDate.now())) {

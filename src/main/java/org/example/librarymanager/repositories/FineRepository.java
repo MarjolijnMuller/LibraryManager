@@ -13,4 +13,9 @@ public interface FineRepository extends JpaRepository<Fine, Long> {
     List<Fine> findByLoan(Loan loan);
     List<Fine> findByInvoice(Invoice invoice);
     List<Fine> findByIsPaidFalse();
+
+    //TODO: invoice null?
+    List<Fine> findByIsReadyForInvoiceTrueAndIsPaidFalseAndInvoiceIsNull();
+
+    List<Fine> findByIsReadyForInvoiceTrueAndIsPaidFalseAndInvoiceIsNullAndLoan_User(User user);
 }
