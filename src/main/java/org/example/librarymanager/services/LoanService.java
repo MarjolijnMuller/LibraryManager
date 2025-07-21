@@ -1,5 +1,6 @@
 package org.example.librarymanager.services;
 
+import org.example.librarymanager.config.FineConfiguration;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.dtos.LoanPatchDto;

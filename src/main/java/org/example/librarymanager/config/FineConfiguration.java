@@ -1,4 +1,4 @@
-package org.example.librarymanager.models;
+package org.example.librarymanager.config;
 
 
 import jakarta.persistence.Column;

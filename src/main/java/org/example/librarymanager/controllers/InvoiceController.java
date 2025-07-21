@@ -1,112 +1,106 @@
 package org.example.librarymanager.controllers;
 
-import jakarta.validation.Valid;
-import org.example.librarymanager.dtos.BookCopyDto;
 import org.example.librarymanager.dtos.InvoiceDto;
 import org.example.librarymanager.dtos.InvoiceInputDto;
 import org.example.librarymanager.mappers.InvoiceMapper;
 import org.example.librarymanager.models.Invoice;
 import org.example.librarymanager.models.PaymentStatus;
 import org.example.librarymanager.services.InvoiceService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/invoices")
 public class InvoiceController {
+
     private final InvoiceService invoiceService;
 
-    public InvoiceController(final InvoiceService invoiceService) {
+    public InvoiceController(InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
     }
 
     @PostMapping
-    public ResponseEntity<InvoiceDto> createInvoice(@Valid @RequestBody InvoiceInputDto invoiceInputDto) {
-        Invoice invoice = this.invoiceService.createInvoice(invoiceInputDto);
-        InvoiceDto invoiceDto = InvoiceMapper.toResponseDto(invoice);
-
-        URI uri = URI.create(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/" + invoiceDto.invoiceId)
-                        .toUriString());
-        return ResponseEntity.created(uri).body(invoiceDto);
+    public ResponseEntity<InvoiceDto> createInvoice(@RequestBody InvoiceInputDto invoiceInputDto) {
+        Invoice createdInvoice = invoiceService.createInvoice(invoiceInputDto);
+        return new ResponseEntity<>(InvoiceMapper.toResponseDto(createdInvoice), HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<InvoiceDto>> getAllInvoices() {
-        List<Invoice> allInvoices = invoiceService.getAllInvoices();
-        List<InvoiceDto> allInvoiceDtos = InvoiceMapper.toResponseDtoList(allInvoices);
-        return ResponseEntity.ok(allInvoiceDtos);
+        List<Invoice> invoices = invoiceService.getAllInvoices();
+        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
-    @GetMapping("/{invoiceId}")
-    public ResponseEntity<InvoiceDto> getInvoiceById(@PathVariable Long invoiceId) {
-        return ResponseEntity.ok(InvoiceMapper.toResponseDto(invoiceService.getInvoiceById(invoiceId)));
+    @GetMapping("/{id}")
+    public ResponseEntity<InvoiceDto> getInvoiceById(@PathVariable("id") Long id) {
+        Invoice invoice = invoiceService.getInvoiceById(id);
+        return ResponseEntity.ok(InvoiceMapper.toResponseDto(invoice));
     }
 
-    @GetMapping("/date/{date}")
-    public ResponseEntity<List<InvoiceDto>> getInvoiceByDate(@PathVariable LocalDate date) {
-        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoiceService.getInvoicesByDate(date)));
+    @GetMapping("/generate")
+    public ResponseEntity<List<InvoiceDto>> generateInvoices() {
+        List<Invoice> generatedInvoices = invoiceService.generateInvoicesForReadyFines();
+        if (generatedInvoices.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(generatedInvoices));
     }
 
-    @GetMapping("/date/before/{date}")
-    public ResponseEntity<List<InvoiceDto>> getInvoiceByDateBefore(@PathVariable LocalDate date) {
-        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoiceService.getInvoicesBeforeDate(date)));
+    @PatchMapping("/{id}/pay")
+    public ResponseEntity<InvoiceDto> processPayment(@PathVariable("id") Long id) {
+        Invoice updatedInvoice = invoiceService.processInvoicePayment(id);
+        return ResponseEntity.ok(InvoiceMapper.toResponseDto(updatedInvoice));
     }
 
-    @GetMapping("/date/after/{date}")
-    public ResponseEntity<List<InvoiceDto>> getInvoiceByDateAfter(@PathVariable LocalDate date) {
-        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoiceService.getInvoicesAfterDate(date)));
+    @GetMapping("/by-date")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesByDate(@RequestParam("date") LocalDate date) {
+        List<Invoice> invoices = invoiceService.getInvoicesByDate(date);
+        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
-    @GetMapping("/date/between/{startDate}/{endDate}")
-    public ResponseEntity<List<InvoiceDto>> getInvoiceByDateBetween(@PathVariable LocalDate startDate, @PathVariable LocalDate endDate) {
-        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoiceService.getInvoicesByDateRangeSorted(startDate, endDate)));
+    @GetMapping("/before-date")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesBeforeDate(@RequestParam("date") LocalDate date) {
+        List<Invoice> invoices = invoiceService.getInvoicesBeforeDate(date);
+        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
-    @GetMapping("/period/{period}")
-    public ResponseEntity<List<InvoiceDto>> getInvoiceByPeriod(@PathVariable String period) {
-        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoiceService.getInvoicesByInvoicePeriod(period)));
+    @GetMapping("/after-date")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesAfterDate(@RequestParam("date") LocalDate date) {
+        List<Invoice> invoices = invoiceService.getInvoicesAfterDate(date);
+        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
+    @GetMapping("/date-range")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesByDateRangeSorted(
+            @RequestParam("startDate") LocalDate startDate,
+            @RequestParam("endDate") LocalDate endDate) {
+        List<Invoice> invoices = invoiceService.getInvoicesByDateRangeSorted(startDate, endDate);
+        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
+    }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<InvoiceDto>> getInvoiceByPaymentStatus(@PathVariable String status) {
+    @GetMapping("/by-period")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesByInvoicePeriod(@RequestParam("period") String invoicePeriod) {
+        List<Invoice> invoices = invoiceService.getInvoicesByInvoicePeriod(invoicePeriod);
+        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
+    }
+
+    @GetMapping("/by-status")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesByPaymentStatus(@RequestParam("status") String paymentStatusString) {
         try {
-            List<Invoice> invoices = invoiceService.getInvoicesByPaymentStatus(PaymentStatus.valueOf(status.toUpperCase()));
-
-            List<InvoiceDto> invoiceDtos = InvoiceMapper.toResponseDtoList(invoices);
-
-            return ResponseEntity.ok(invoiceDtos);
+            PaymentStatus paymentStatus = PaymentStatus.valueOf(paymentStatusString.toUpperCase());
+            List<Invoice> invoices = invoiceService.getInvoicesByPaymentStatus(paymentStatus);
+            return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PutMapping("/{invoiceId}")
-    public ResponseEntity<InvoiceDto> updateInvoice(@Valid @PathVariable Long invoiceId, @RequestBody InvoiceInputDto invoiceInputDto) {
-        Invoice invoice = this.invoiceService.updateInvoice(invoiceId, invoiceInputDto);
-        InvoiceDto invoiceDto = InvoiceMapper.toResponseDto(invoice);
-        return ResponseEntity.ok(invoiceDto);
-    }
-
-    @PatchMapping("/{invoiceId}")
-    public ResponseEntity<InvoiceDto> patchInvoice(@Valid @PathVariable Long invoiceId, @RequestBody InvoiceInputDto invoiceInputDto) {
-        Invoice invoice = this.invoiceService.patchInvoice(invoiceId, invoiceInputDto);
-        InvoiceDto invoiceDto = InvoiceMapper.toResponseDto(invoice);
-        return ResponseEntity.ok(invoiceDto);
-    }
-
-    @DeleteMapping("/{invoiceId}")
-    public ResponseEntity<InvoiceDto> deleteInvoice(@PathVariable Long invoiceId) {
-        invoiceService.deleteInvoice(invoiceId);
-        return ResponseEntity.noContent().build();
-    }
-}
+    @PutMapping("/{id}")
+    public ResponseEntity<InvoiceDto> updateInvoice(@PathVariable("id") Long id, @RequestBody InvoiceInputDto invoiceInputDto) {
+        Invoice updatedInvoice = invoiceService.updateInvoice(id, invoiceInputDto);
+        return ResponseEntity

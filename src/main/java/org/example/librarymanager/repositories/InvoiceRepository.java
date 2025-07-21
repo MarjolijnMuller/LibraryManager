@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
-    Invoice findByInvoiceId(Long invoiceId);
     List<Invoice> findByInvoiceDate(LocalDate invoiceDate);
     List<Invoice> findByInvoiceDateBeforeOrderByInvoiceDateAsc(LocalDate invoiceDate);
     List<Invoice> findByInvoiceDateAfterOrderByInvoiceDateDesc(LocalDate invoiceDate);
