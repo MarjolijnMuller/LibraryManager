@@ -13,9 +13,6 @@ public class InvoiceInputDto {
     @NotNull
     public LocalDate invoiceDate;
     public String invoicePeriod;
-    @NotNull
-    @PositiveOrZero
-    public Double invoiceAmount;
     public String paymentStatus;
     public Long userId;
 }

@@ -32,20 +32,6 @@ public class InvoiceService {
     }
 
     @Transactional
-    public Invoice createInvoice(InvoiceInputDto invoiceInputDto){
-        User user = null;
-        if (invoiceInputDto.userId != null) {
-            user = userRepository.findById(invoiceInputDto.userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Gebruiker niet gevonden met ID: " + invoiceInputDto.userId));
-        }
-
-        Invoice newInvoice = InvoiceMapper.toEntity(invoiceInputDto);
-        newInvoice.setUser(user);
-
-        return this.invoiceRepository.save(newInvoice);
-    }
-
-    @Transactional
     public List<Invoice> generateInvoicesForReadyFines() {
         List<Fine> readyFines = fineRepository.findByIsReadyForInvoiceTrueAndIsPaidFalseAndInvoiceIsNull();
         List<Invoice> generatedInvoices = new ArrayList<>();
@@ -97,7 +83,6 @@ public class InvoiceService {
         invoice.setPaymentStatus(PaymentStatus.PAID);
         Invoice updatedInvoice = invoiceRepository.save(invoice);
 
-        // Markeer alle bijbehorende boetes als betaald
         List<Fine> finesOnInvoice = fineRepository.findByInvoice(invoice);
         for (Fine fine : finesOnInvoice) {
             fine.setIsPaid(true);
@@ -151,9 +136,6 @@ public class InvoiceService {
         if (invoiceInputDto.invoiceDate != null) {
             existingInvoice.setInvoiceDate(invoiceInputDto.invoiceDate);
         }
-        if (invoiceInputDto.invoiceAmount != null) {
-            existingInvoice.setInvoiceAmount(invoiceInputDto.invoiceAmount);
-        }
 
         if(invoiceInputDto.paymentStatus != null && !invoiceInputDto.paymentStatus.trim().isEmpty()){
             try {
@@ -182,9 +164,7 @@ public class InvoiceService {
         if (updates.invoiceDate != null) {
             existingInvoice.setInvoiceDate(updates.invoiceDate);
         }
-        if (updates.invoiceAmount != null) {
-            existingInvoice.setInvoiceAmount(updates.invoiceAmount);
-        }
+
         if (updates.paymentStatus != null) {
             try {
                 PaymentStatus newStatus = PaymentStatus.valueOf(updates.paymentStatus.trim().toUpperCase());

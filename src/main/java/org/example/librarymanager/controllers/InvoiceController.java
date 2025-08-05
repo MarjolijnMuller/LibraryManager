@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/invoices")
@@ -22,12 +21,6 @@ public class InvoiceController {
 
     public InvoiceController(InvoiceService invoiceService) {
         this.invoiceService = invoiceService;
-    }
-
-    @PostMapping
-    public ResponseEntity<InvoiceDto> createInvoice(@RequestBody InvoiceInputDto invoiceInputDto) {
-        Invoice createdInvoice = invoiceService.createInvoice(invoiceInputDto);
-        return new ResponseEntity<>(InvoiceMapper.toResponseDto(createdInvoice), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -57,43 +50,50 @@ public class InvoiceController {
         return ResponseEntity.ok(InvoiceMapper.toResponseDto(updatedInvoice));
     }
 
-    @GetMapping("/by-date")
-    public ResponseEntity<List<InvoiceDto>> getInvoicesByDate(@RequestParam("date") LocalDate date) {
+    @GetMapping("/date/{date}")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesByDate(@PathVariable("date") LocalDate date) {
         List<Invoice> invoices = invoiceService.getInvoicesByDate(date);
+        if (invoices.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
-    @GetMapping("/before-date")
-    public ResponseEntity<List<InvoiceDto>> getInvoicesBeforeDate(@RequestParam("date") LocalDate date) {
+    @GetMapping("/date/before/{date}")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesBeforeDate(@PathVariable("date") LocalDate date) {
         List<Invoice> invoices = invoiceService.getInvoicesBeforeDate(date);
+        if (invoices.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
-    @GetMapping("/after-date")
-    public ResponseEntity<List<InvoiceDto>> getInvoicesAfterDate(@RequestParam("date") LocalDate date) {
+    @GetMapping("/date/after/{date}")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesAfterDate(@PathVariable("date") LocalDate date) {
         List<Invoice> invoices = invoiceService.getInvoicesAfterDate(date);
+        if (invoices.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
-    @GetMapping("/date-range")
-    public ResponseEntity<List<InvoiceDto>> getInvoicesByDateRangeSorted(
-            @RequestParam("startDate") LocalDate startDate,
-            @RequestParam("endDate") LocalDate endDate) {
-        List<Invoice> invoices = invoiceService.getInvoicesByDateRangeSorted(startDate, endDate);
-        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
-    }
-
-    @GetMapping("/by-period")
-    public ResponseEntity<List<InvoiceDto>> getInvoicesByInvoicePeriod(@RequestParam("period") String invoicePeriod) {
+    @GetMapping("/period/{invoicePeriod}")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesByInvoicePeriod(@PathVariable("invoicePeriod") String invoicePeriod) {
         List<Invoice> invoices = invoiceService.getInvoicesByInvoicePeriod(invoicePeriod);
+        if (invoices.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
-    @GetMapping("/by-status")
-    public ResponseEntity<List<InvoiceDto>> getInvoicesByPaymentStatus(@RequestParam("status") String paymentStatusString) {
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<InvoiceDto>> getInvoicesByPaymentStatus(@PathVariable("status") String paymentStatusString) {
         try {
             PaymentStatus paymentStatus = PaymentStatus.valueOf(paymentStatusString.toUpperCase());
             List<Invoice> invoices = invoiceService.getInvoicesByPaymentStatus(paymentStatus);
+            if (invoices.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
             return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -103,4 +103,18 @@ public class InvoiceController {
     @PutMapping("/{id}")
     public ResponseEntity<InvoiceDto> updateInvoice(@PathVariable("id") Long id, @RequestBody InvoiceInputDto invoiceInputDto) {
         Invoice updatedInvoice = invoiceService.updateInvoice(id, invoiceInputDto);
-        return ResponseEntity
+        return ResponseEntity.ok(InvoiceMapper.toResponseDto(updatedInvoice));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<InvoiceDto> patchInvoice(@PathVariable("id") Long id, @RequestBody InvoiceInputDto updates) {
+        Invoice patchedInvoice = invoiceService.patchInvoice(id, updates);
+        return ResponseEntity.ok(InvoiceMapper.toResponseDto(patchedInvoice));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteInvoice(@PathVariable("id") Long id) {
+        invoiceService.deleteInvoice(id);
+        return ResponseEntity.noContent().build();
+    }
+}

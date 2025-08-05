@@ -5,6 +5,7 @@ import org.example.librarymanager.dtos.InvoiceInputDto;
 import org.example.librarymanager.models.Invoice;
 import org.example.librarymanager.models.PaymentStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +38,18 @@ public class InvoiceMapper {
         invoiceDto.invoicePeriod = invoice.getInvoicePeriod();
         invoiceDto.invoiceAmount = invoice.getInvoiceAmount();
         invoiceDto.paymentStatus = invoice.getPaymentStatus();
+
+        if (invoice.getUser() != null) {
+            invoiceDto.userId = invoice.getUser().getUserId();
+        }
+
+        if (invoice.getFines() != null && !invoice.getFines().isEmpty()) {
+            invoiceDto.fines = invoice.getFines().stream()
+                    .map(FineMapper::toResponseDto)
+                    .collect(Collectors.toList());
+        } else {
+            invoiceDto.fines = new ArrayList<>();
+        }
         return invoiceDto;
     }
 
