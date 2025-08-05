@@ -34,6 +34,9 @@ public class Fine {
     @Column(nullable = false)
     private Boolean isPaid = false;
 
+    @Column(nullable = false)
+    private Boolean isReadyForInvoice = false;
+
     @ManyToOne
     @JoinColumn(name="loan_id")
     @NotNull
@@ -43,29 +46,21 @@ public class Fine {
     @JoinColumn(name="invoice_id")
     private Invoice invoice;
 
-    public Fine(Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan, Invoice invoice) {
+    public Fine(Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan, Invoice invoice, Boolean isReadyForInvoice) {
         this.fineAmount = fineAmount;
         this.fineDate = fineDate;
         this.isPaid = isPaid;
         this.loan = loan;
         this.invoice = invoice;
+        this.isReadyForInvoice = false;
     }
 
-    public Fine(Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan) {
+    public Fine(Double fineAmount, LocalDate fineDate, Boolean isPaid, Loan loan, Boolean isReadyForInvoice, Invoice invoice) {
         this.fineAmount = fineAmount;
         this.fineDate = fineDate;
         this.isPaid = isPaid;
         this.loan = loan;
         this.invoice = null;
+        this.isReadyForInvoice = false;
     }
-
-    public Boolean isPaid() {
-        return isPaid;
-    }
-
-    public void setPaid(Boolean paid) {
-        isPaid = paid;
-    }
-
-
 }

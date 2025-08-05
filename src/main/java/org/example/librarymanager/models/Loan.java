@@ -31,6 +31,8 @@ public class Loan {
     @Column(nullable = false)
     private LocalDate returnDate;
 
+    private LocalDate actualReturnDate;
+
     @Column(nullable = false)
     private Boolean isReturned = false;
 
@@ -46,13 +48,4 @@ public class Loan {
     @OneToMany(mappedBy = "loan", cascade = CascadeType.ALL)
     private List<Fine> fines = new ArrayList<>();
 
-
-    public Boolean isReturned() {
-        return isReturned;
-    }
-
-    public void setReturned(Boolean returned) {
-        isReturned = returned;
-
-    }
 }

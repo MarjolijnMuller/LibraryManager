@@ -44,4 +44,9 @@ public class Invoice {
 
     @OneToMany(mappedBy="invoice", cascade = CascadeType.ALL)
     private List<Fine> fines = new ArrayList<>();
+
+    //TODO: nullable false? alleen te maken met facturen van members
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
 }

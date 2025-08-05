@@ -21,18 +21,6 @@ public class FineController {
         this.fineService = fineService;
     }
 
-    @PostMapping
-    public ResponseEntity<FineDto> createFine(@Valid @RequestBody FineInputDto fineInputDto) {
-        FineDto fineDto = fineService.createFine(fineInputDto);
-
-        URI uri = URI.create(
-                ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/" + fineDto.fineId)
-                        .toUriString()
-        );
-        return ResponseEntity.created(uri).body(fineDto);
-    }
 
     @GetMapping
     public ResponseEntity<List<FineDto>> getAllFines() {

@@ -1,5 +1,6 @@
 package org.example.librarymanager.services;
 
+import org.example.librarymanager.config.FineConfiguration;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.dtos.LoanPatchDto;
@@ -10,7 +11,9 @@ import org.example.librarymanager.repositories.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LoanService {
@@ -18,12 +21,15 @@ public class LoanService {
     private final BookCopyRepository bookCopyRepository;
     private final UserRepository userRepository;
     private final FineRepository fineRepository;
+    private final FineConfigurationRepository fineConfigurationRepository;
 
-    public LoanService(LoanRepository loanRepository, BookCopyRepository bookCopyRepository, UserRepository userRepository, FineRepository fineRepository) {
+
+    public LoanService(LoanRepository loanRepository, BookCopyRepository bookCopyRepository, UserRepository userRepository, FineRepository fineRepository, FineConfigurationRepository fineConfigurationRepository) {
         this.loanRepository = loanRepository;
         this.bookCopyRepository = bookCopyRepository;
         this.userRepository = userRepository;
         this.fineRepository = fineRepository;
+        this.fineConfigurationRepository = fineConfigurationRepository;
     }
 
     public LoanDto createLoan(LoanInputDto loanInputDto) {
@@ -61,30 +67,53 @@ public class LoanService {
 
     public LoanDto returnBookCopy(Long loanId) {
         Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
-        if (loan.isReturned()) {
+        if (loan.getIsReturned()) {
             throw new IllegalArgumentException("Loan already returned.");
         }
 
-        loan.setReturned(true);
+        loan.setIsReturned(true);
+        loan.setActualReturnDate(LocalDate.now());
+        Loan savedLoan = loanRepository.save(loan);
+
         BookCopy bookCopy = loan.getBookCopy();
         bookCopy.setStatus(BookCopyStatus.AVAILABLE);
         bookCopyRepository.save(bookCopy);
 
-        LocalDate actualReturnDate = LocalDate.now();
-        if (actualReturnDate.isAfter(loan.getReturnDate())) {
-            long overdueDays = java.time.temporal.ChronoUnit.DAYS.between(loan.getReturnDate(), actualReturnDate);
-            Double fineAmount = overdueDays * 0.50;
-
-            if (fineAmount > 0) {
-                Fine newFine = new Fine();
-                newFine.setFineAmount(fineAmount);
-                newFine.setFineDate(actualReturnDate);
-                newFine.setIsPaid(false);
-                newFine.setLoan(loan);
-                fineRepository.save(newFine);
-            }
-        }
+        calculateAndSaveFine(savedLoan);
         return LoanMapper.toResponseDto(loanRepository.save(loan));
+    }
+
+    public Fine calculateAndSaveFine(Loan loan) {
+        FineConfiguration config = fineConfigurationRepository.findById(1L)
+                .orElseThrow(() -> new IllegalStateException("Boete configuratie niet gevonden! Zorg ervoor dat deze is ingesteld in de database."));
+
+        LocalDate dueDate = loan.getReturnDate();
+        LocalDate calculationDate = loan.getActualReturnDate() != null ? loan.getActualReturnDate() : LocalDate.now();
+
+        if (calculationDate.isAfter(dueDate)) {
+            long overdueDays = ChronoUnit.DAYS.between(dueDate, calculationDate);
+            double calculatedFineAmount = overdueDays * config.getDailyRate();
+
+            if (calculatedFineAmount > config.getMaxFineAmount()) {
+                calculatedFineAmount = config.getMaxFineAmount();
+            }
+
+            Optional<Fine> existingFineOptional = loan.getFines().stream().findFirst();
+            Fine fine = existingFineOptional.orElseGet(Fine::new);
+
+            fine.setLoan(loan);
+            fine.setFineAmount(calculatedFineAmount);
+            fine.setFineDate(LocalDate.now());
+            fine.setIsPaid(false);
+            fine.setInvoice(null);
+
+            fine.setIsReadyForInvoice(loan.getActualReturnDate() != null || calculatedFineAmount >= config.getMaxFineAmount());
+
+            return fineRepository.save(fine);
+        } else {
+            loan.getFines().stream().findFirst().ifPresent(fineRepository::delete);
+            return null;
+        }
     }
 
     public List<LoanDto> getLoansByBookCopyId(Long bookCopyId) {
@@ -112,14 +141,52 @@ public class LoanService {
         User user = userRepository.findById(loanInputDto.userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lid (User) niet gevonden met ID: " + loanInputDto.userId));
 
+        boolean wasReturnedBeforeUpdate = existingLoan.getIsReturned();
+
         existingLoan.setLoanDate(loanInputDto.loanDate);
         existingLoan.setReturnDate(loanInputDto.returnDate);
-        existingLoan.setReturned(loanInputDto.isReturned);
+        existingLoan.setIsReturned(loanInputDto.isReturned);
         existingLoan.setBookCopy(bookCopy);
         existingLoan.setUser(user);
 
+        if (loanInputDto.isReturned != null && loanInputDto.isReturned && !wasReturnedBeforeUpdate) {
+            existingLoan.setIsReturned(true);
+            existingLoan.setActualReturnDate(LocalDate.now());
+        } else if (loanInputDto.isReturned != null && !loanInputDto.isReturned && wasReturnedBeforeUpdate) {
+
+            existingLoan.setIsReturned(false);
+            existingLoan.setActualReturnDate(null);
+            existingLoan.getFines().stream().findFirst().ifPresent(fineRepository::delete);
+        } else if (loanInputDto.isReturned != null) {
+            existingLoan.setIsReturned(loanInputDto.isReturned);
+        }
+
+        Loan savedLoan = loanRepository.save(existingLoan);
+
+        if (savedLoan.getIsReturned()) {
+            calculateAndSaveFine(savedLoan);
+        } else if (savedLoan.getReturnDate() != null && savedLoan.getReturnDate().isBefore(LocalDate.now())) {
+            calculateAndSaveFine(savedLoan);
+        }
+
         return LoanMapper.toResponseDto(loanRepository.save(existingLoan));
     }
+
+    public void updateOverdueFines() {
+        List<Loan> overdueLoans = loanRepository.findByReturnDateBeforeAndIsReturnedFalse(LocalDate.now());
+        for (Loan loan : overdueLoans) {
+            Optional<Fine> existingFine = loan.getFines().stream().findFirst();
+            if (existingFine.isPresent()) {
+                if (!existingFine.get().getIsReadyForInvoice()) {
+                    calculateAndSaveFine(loan);
+                }
+            } else {
+                calculateAndSaveFine(loan);
+            }
+        }
+    }
+
+
 
     public LoanDto patchLoan(Long loanId, LoanPatchDto loanPatchDto) {
         Loan existingLoan = loanRepository.findById(loanId)
@@ -133,7 +200,7 @@ public class LoanService {
         }
 
         if (loanPatchDto.isReturned != null) {
-            existingLoan.setReturned(loanPatchDto.isReturned);
+            existingLoan.setIsReturned(loanPatchDto.isReturned);
         }
 
         if (loanPatchDto.bookCopyId != null) {
@@ -153,8 +220,9 @@ public class LoanService {
 
     public void deleteLoan(Long loanId) {
         Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
+
         BookCopy bookCopy = loan.getBookCopy();
-        if (bookCopy != null && bookCopy.getStatus() == BookCopyStatus.ON_LOAN && !loan.isReturned()) {
+        if (bookCopy != null && bookCopy.getStatus() == BookCopyStatus.ON_LOAN && !loan.getIsReturned()) {
             bookCopy.setStatus(BookCopyStatus.AVAILABLE);
             bookCopyRepository.save(bookCopy);
         }
