@@ -2,6 +2,7 @@ package org.example.librarymanager.services;
 
 import org.example.librarymanager.dtos.BookCopyDto;
 import org.example.librarymanager.dtos.BookCopyInputDto;
+import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.BookCopyMapper;
 import org.example.librarymanager.models.Book;
 import org.example.librarymanager.models.BookCategory;
@@ -83,7 +84,7 @@ public class BookCopyService {
 
     public List<BookCopyDto> getAllBookCopiesForBook(Long bookId) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Boek niet gevonden met ID: " + bookId));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ID: " + bookId));
         List<BookCopy> copies = bookCopyRepository.findBookCopiesByBook(book);
         return BookCopyMapper.toDtoList(copies);
     }

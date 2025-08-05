@@ -53,7 +53,7 @@ public class FineService {
         Fine fine = fineRepository.findById(fineId). orElseThrow(() -> new ResourceNotFoundException("Fine not found with ID: " + fineId));
 
         if (fine.getIsPaid()) {
-            throw new IllegalArgumentException("Fine already paid");
+            throw new IllegalStateException("Fine with ID " + fineId + " has already been paid.");
         }
 
         fine.setIsPaid(true);
@@ -106,6 +106,9 @@ public class FineService {
     }
 
     public void deleteFine(Long fineId) {
+        if (!fineRepository.existsById(fineId)) {
+            throw new ResourceNotFoundException("Fine not found with ID: " + fineId);
+        }
         this.fineRepository.deleteById(fineId);
     }
 }

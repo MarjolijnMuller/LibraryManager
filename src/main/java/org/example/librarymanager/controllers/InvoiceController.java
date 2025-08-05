@@ -26,6 +26,9 @@ public class InvoiceController {
     @GetMapping
     public ResponseEntity<List<InvoiceDto>> getAllInvoices() {
         List<Invoice> invoices = invoiceService.getAllInvoices();
+        if (invoices.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
         return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 

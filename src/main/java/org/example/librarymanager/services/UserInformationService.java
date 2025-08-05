@@ -52,7 +52,7 @@ public class UserInformationService {
                 if (optionalRole.isPresent()) {
                     assignedRoles.add(optionalRole.get());
                 } else {
-
+                    throw new IllegalArgumentException("Invalid role specified: " + roleName);
                 }
             }
         }

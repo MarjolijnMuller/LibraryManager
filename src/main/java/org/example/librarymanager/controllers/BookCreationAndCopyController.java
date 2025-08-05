@@ -39,6 +39,9 @@ public class BookCreationAndCopyController {
     @GetMapping("/{bookId}/copies")
     public ResponseEntity<List<BookCopyDto>> getAllCopiesForBook(@PathVariable Long bookId) {
         List<BookCopyDto> copies = bookCopyService.getAllBookCopiesForBook(bookId);
+        if (copies.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok(copies);
     }
 
@@ -52,6 +55,9 @@ public class BookCreationAndCopyController {
     public ResponseEntity<List<BookCopyDto>> getBookCopiesByStatus(@PathVariable String status) {
         try {
             List<BookCopyDto> copies = bookCopyService.getAllBookCopiesByStatus(org.example.librarymanager.models.BookCopyStatus.valueOf(status.toUpperCase()));
+            if (copies.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
             return ResponseEntity.ok(copies);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);

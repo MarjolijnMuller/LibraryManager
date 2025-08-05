@@ -39,6 +39,9 @@ public class BookController {
     @GetMapping("/title/{title}")
     public ResponseEntity<List<BookDto>> getBookByTitle(@PathVariable String title) {
         List<Book> allBooksByTitle = bookService.getBooksByTitle(title);
+        if (allBooksByTitle.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         List<BookDto> allBooksByTitleDto = BookMapper.toResponseDtoList(allBooksByTitle);
         return ResponseEntity.ok(allBooksByTitleDto);
     }
@@ -46,6 +49,9 @@ public class BookController {
     @GetMapping("/author/{authorLastName}")
     public ResponseEntity<List<BookDto>> getBookByAuthor(@PathVariable String authorLastName) {
         List<Book> allBooksByAuthorLastName = bookService.getBooksByAuthorLastName(authorLastName);
+        if (allBooksByAuthorLastName.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
         List<BookDto> allBooksByAuthorDto = BookMapper.toResponseDtoList(allBooksByAuthorLastName);
         return ResponseEntity.ok(allBooksByAuthorDto);
     }
