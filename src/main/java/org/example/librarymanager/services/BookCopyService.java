@@ -11,7 +11,6 @@ import org.example.librarymanager.models.BookCopyStatus;
 import org.example.librarymanager.repositories.BookCopyRepository;
 import org.example.librarymanager.repositories.BookRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,10 +25,9 @@ public class BookCopyService {
         this.bookRepository = bookRepository;
     }
 
-
     public BookCopyDto createBookCopy(BookCopyInputDto bookCopyInputDto) {
         if (bookCopyInputDto.ISBN == null || bookCopyInputDto.ISBN.trim().isEmpty()) {
-            throw new IllegalArgumentException("ISBN mag niet leeg zijn.");
+            throw new IllegalArgumentException("ISBN cannot be empty.");
         }
 
         Optional<Book> existingBookOptional = bookRepository.findBookByISBN(bookCopyInputDto.ISBN);
@@ -42,14 +40,14 @@ public class BookCopyService {
                     bookCopyInputDto.authorFirstName == null || bookCopyInputDto.authorFirstName.trim().isEmpty() ||
                     bookCopyInputDto.authorLastName == null || bookCopyInputDto.authorLastName.trim().isEmpty() ||
                     bookCopyInputDto.category == null || bookCopyInputDto.category.trim().isEmpty()) {
-                throw new IllegalArgumentException("Voor een nieuw boek zijn titel, auteur en categorie verplicht.");
+                throw new IllegalArgumentException("For a new book, title, author, and category are required.");
             }
 
             BookCategory categoryEnum;
             try {
                 categoryEnum = BookCategory.valueOf(bookCopyInputDto.category.toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Ongeldige boekcategorie: " + bookCopyInputDto.category);
+                throw new IllegalArgumentException("Invalid book category: " + bookCopyInputDto.category);
             }
 
             book = new Book(
@@ -90,7 +88,8 @@ public class BookCopyService {
     }
 
     public BookCopyDto getBookCopyByBookIdAndFollowNumber(Long bookId, Long followNumber) {
-        BookCopy bookCopy = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber).orElseThrow(() -> new IllegalArgumentException("Boekenexemplaar niet gevonden voor boek ID: " + bookId + " en volgnummer: " + followNumber));
+        BookCopy bookCopy = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Book copy not found for book ID: " + bookId + " and follow number: " + followNumber));
         return BookCopyMapper.toResponseDto(bookCopy);
     }
 
@@ -101,11 +100,11 @@ public class BookCopyService {
 
     public BookCopy updateBookCopy(Long bookId, Long followNumber, BookCopyInputDto bookCopyInputDto) {
         BookCopy existingBookCopy = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber)
-                .orElseThrow(() -> new IllegalArgumentException("Boekenexemplaar niet gevonden voor boek ID: " + bookId + " en volgnummer: " + followNumber));
+                .orElseThrow(() -> new ResourceNotFoundException("Book copy not found for book ID: " + bookId + " and follow number: " + followNumber));
         if (bookCopyInputDto.status != null) {
             existingBookCopy.setStatus(bookCopyInputDto.status);
         } else {
-            throw new IllegalArgumentException("Status is verplicht voor een volledige update (PUT) van een boekenexemplaar.");
+            throw new IllegalArgumentException("Status is required for a complete update (PUT) of a book copy.");
         }
         return bookCopyRepository.save(existingBookCopy);
     }
@@ -113,13 +112,9 @@ public class BookCopyService {
     //TODO: patch
 
     public void deleteBookCopy(Long bookId, Long followNumber) {
-        Optional<BookCopy> bookCopyOptional = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber);
+        BookCopy bookCopyToDelete = bookCopyRepository.findByBook_BookIdAndFollowNumber(bookId, followNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Book copy not found for book ID: " + bookId + " and follow number: " + followNumber));
 
-        if (bookCopyOptional.isPresent()) {
-            BookCopy bookCopyToDelete = bookCopyOptional.get();
-            bookCopyRepository.delete(bookCopyToDelete);
-        } else {
-            throw new IllegalArgumentException("Boekenexemplaar niet gevonden voor boek ID: " + bookId + " en volgnummer: " + followNumber);
-        }
+        bookCopyRepository.delete(bookCopyToDelete);
     }
 }

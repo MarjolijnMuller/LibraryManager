@@ -19,7 +19,7 @@ public class BookCreationAndCopyController {
 
     private final BookCopyService bookCopyService;
 
-    public BookCreationAndCopyController(final BookCopyService bookCopyService) {
+    public BookCreationAndCopyController(BookCopyService bookCopyService) {
         this.bookCopyService = bookCopyService;
     }
 
