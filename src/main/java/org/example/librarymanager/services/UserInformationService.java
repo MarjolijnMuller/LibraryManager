@@ -52,7 +52,7 @@ public class UserInformationService {
                 if (optionalRole.isPresent()) {
                     assignedRoles.add(optionalRole.get());
                 } else {
-
+                    throw new IllegalArgumentException("Invalid role specified: " + roleName);
                 }
             }
         }
@@ -87,8 +87,8 @@ public class UserInformationService {
 
     }
 
-    public UserInformationDto getUserById(Long id){
-        UserInformation userInformation = userInformationRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
+    public UserInformationDto getUserById(Long userId){
+        UserInformation userInformation = userInformationRepository.findByUser_UserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
         return userInformationMapper.toResponseDto(userInformation);
     }
 

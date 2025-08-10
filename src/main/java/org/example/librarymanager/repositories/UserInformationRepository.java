@@ -12,6 +12,7 @@ public interface UserInformationRepository extends JpaRepository<UserInformation
     List<UserInformation> findByFirstNameAndLastNameIgnoreCase(String firstName, String lastName);
     List<UserInformation> findByEmailIgnoreCase(String email);
     List<UserInformation> findByPostalCodeAndHouseNumberIgnoreCase(String postalCode, String houseNumber);
+    Optional<UserInformation> findByUser_UserId(Long userId);
 
     Optional<UserInformation> findByUser_UsernameIgnoreCase(String username);
 }

@@ -8,6 +8,4 @@ public class FineDto {
     public LocalDate fineDate;
     public Boolean isPaid = false;
     public Long loanId;
-    public Long invoiceId;
-    public Boolean isReadyForInvoice;
 }

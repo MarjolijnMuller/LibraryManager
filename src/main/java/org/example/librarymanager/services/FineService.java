@@ -53,7 +53,7 @@ public class FineService {
         Fine fine = fineRepository.findById(fineId). orElseThrow(() -> new ResourceNotFoundException("Fine not found with ID: " + fineId));
 
         if (fine.getIsPaid()) {
-            throw new IllegalArgumentException("Fine already paid");
+            throw new IllegalStateException("Fine with ID " + fineId + " has already been paid.");
         }
 
         fine.setIsPaid(true);
@@ -64,11 +64,11 @@ public class FineService {
         Fine existingFine = fineRepository.findById(fineId).orElseThrow(() -> new ResourceNotFoundException("Fine not found with ID: " + fineId));
 
         if (fineInputDto.loanId != null && !existingFine.getLoan().getLoanId().equals(fineInputDto.loanId)) {
-            Loan newLoan = loanRepository.findById(fineInputDto.loanId).orElseThrow(() -> new ResourceNotFoundException("Lening niet gevonden met ID: " + fineInputDto.loanId));
+            Loan newLoan = loanRepository.findById(fineInputDto.loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + fineInputDto.loanId));
             existingFine.setLoan(newLoan);
         }
         if (fineInputDto.invoiceId != null && (existingFine.getInvoice() == null || !existingFine.getInvoice().getInvoiceId().equals(fineInputDto.invoiceId))) {
-            Invoice newInvoice = invoiceRepository.findById(fineInputDto.invoiceId).orElseThrow(() -> new ResourceNotFoundException("Factuur niet gevonden met ID: " + fineInputDto.invoiceId));
+            Invoice newInvoice = invoiceRepository.findById(fineInputDto.invoiceId).orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + fineInputDto.invoiceId));
             existingFine.setInvoice(newInvoice);
         } else if (fineInputDto.invoiceId == null && existingFine.getInvoice() != null) {
             existingFine.setInvoice(null);
@@ -106,6 +106,9 @@ public class FineService {
     }
 
     public void deleteFine(Long fineId) {
+        if (!fineRepository.existsById(fineId)) {
+            throw new ResourceNotFoundException("Fine not found with ID: " + fineId);
+        }
         this.fineRepository.deleteById(fineId);
     }
 }

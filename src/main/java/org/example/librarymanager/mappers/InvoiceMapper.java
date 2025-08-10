@@ -14,7 +14,6 @@ public class InvoiceMapper {
         Invoice invoice = new Invoice();
         invoice.setInvoiceDate(invoiceInputDto.invoiceDate);
         invoice.setInvoicePeriod(invoiceInputDto.invoicePeriod);
-        invoice.setInvoiceAmount(invoiceInputDto.invoiceAmount);
 
         PaymentStatus defaultPaymentStatus = PaymentStatus.OPEN;
 

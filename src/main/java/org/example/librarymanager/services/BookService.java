@@ -27,7 +27,7 @@ public class BookService {
 
     public Book getBookById(long id) {
         return bookRepository.findBookWithCopiesById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Book not found with ID: " + id));
     }
 
     public List<Book> getBooksByTitle(String title) {
@@ -99,6 +99,9 @@ public class BookService {
 
 
     public void deleteBook(Long bookId) {
+        if (!bookRepository.existsById(bookId)) {
+            throw new ResourceNotFoundException("Book not found with ID: " + bookId);
+        }
         bookRepository.deleteById(bookId);
     }
 

@@ -39,6 +39,7 @@ public class BookController {
     @GetMapping("/title/{title}")
     public ResponseEntity<List<BookDto>> getBookByTitle(@PathVariable String title) {
         List<Book> allBooksByTitle = bookService.getBooksByTitle(title);
+
         List<BookDto> allBooksByTitleDto = BookMapper.toResponseDtoList(allBooksByTitle);
         return ResponseEntity.ok(allBooksByTitleDto);
     }
@@ -46,6 +47,7 @@ public class BookController {
     @GetMapping("/author/{authorLastName}")
     public ResponseEntity<List<BookDto>> getBookByAuthor(@PathVariable String authorLastName) {
         List<Book> allBooksByAuthorLastName = bookService.getBooksByAuthorLastName(authorLastName);
+
         List<BookDto> allBooksByAuthorDto = BookMapper.toResponseDtoList(allBooksByAuthorLastName);
         return ResponseEntity.ok(allBooksByAuthorDto);
     }

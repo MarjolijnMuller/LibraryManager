@@ -1,6 +1,7 @@
 package org.example.librarymanager.services;
 
 import org.example.librarymanager.dtos.InvoiceInputDto;
+import org.example.librarymanager.exceptions.InvoiceAlreadyPaidException;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.InvoiceMapper;
 import org.example.librarymanager.models.Fine;
@@ -34,11 +35,10 @@ public class InvoiceService {
     @Transactional
     public List<Invoice> generateInvoicesForReadyFines() {
         List<Fine> readyFines = fineRepository.findByIsReadyForInvoiceTrueAndIsPaidFalseAndInvoiceIsNull();
-        List<Invoice> generatedInvoices = new ArrayList<>();
+        List<Long> generatedInvoiceIds = new ArrayList<>();
 
         if (readyFines.isEmpty()) {
-            System.out.println("Geen boetes klaar voor facturatie op " + LocalDate.now() + ".");
-            return generatedInvoices;
+            return new ArrayList<>();
         }
 
         Map<User, List<Fine>> finesByUser = readyFines.stream()
@@ -57,27 +57,28 @@ public class InvoiceService {
                 newInvoice.setInvoiceAmount(totalAmount);
                 newInvoice.setPaymentStatus(PaymentStatus.OPEN);
                 newInvoice.setUser(user);
+                newInvoice.setFines(userFines);
 
                 Invoice savedInvoice = invoiceRepository.save(newInvoice);
-                generatedInvoices.add(savedInvoice);
+                generatedInvoiceIds.add(savedInvoice.getInvoiceId());
 
                 for (Fine fine : userFines) {
                     fine.setInvoice(savedInvoice);
                     fineRepository.save(fine);
                 }
-                System.out.println("Factuur gegenereerd voor gebruiker: " + user.getUserId() + " met bedrag: " + totalAmount + " op " + LocalDate.now() + ".");
             }
         }
-        return generatedInvoices;
+
+        return invoiceRepository.findAllById(generatedInvoiceIds);
     }
 
     @Transactional
     public Invoice processInvoicePayment(Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Factuur niet gevonden met ID: " + invoiceId));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
 
         if (invoice.getPaymentStatus() == PaymentStatus.PAID) {
-            throw new IllegalArgumentException("Factuur met ID " + invoiceId + " is al betaald.");
+            throw new InvoiceAlreadyPaidException("This invoice has already been paid.");
         }
 
         invoice.setPaymentStatus(PaymentStatus.PAID);
@@ -97,7 +98,7 @@ public class InvoiceService {
     }
 
     public Invoice getInvoiceById(Long invoiceId){
-        return this.invoiceRepository.findById(invoiceId).orElseThrow(() -> new ResourceNotFoundException("Factuur niet gevonden met ID: " + invoiceId));
+        return this.invoiceRepository.findById(invoiceId).orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
     }
 
     public List<Invoice> getInvoicesByDate(LocalDate date){
@@ -127,7 +128,7 @@ public class InvoiceService {
     @Transactional
     public Invoice updateInvoice(Long invoiceId, InvoiceInputDto invoiceInputDto){
         Invoice existingInvoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Factuur niet gevonden met ID: " + invoiceId));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
 
         if (invoiceInputDto.invoicePeriod != null) {
             existingInvoice.setInvoicePeriod(invoiceInputDto.invoicePeriod);
@@ -145,7 +146,7 @@ public class InvoiceService {
                 }
                 existingInvoice.setPaymentStatus(newStatus);
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Ongeldige betalingsstatus: " + invoiceInputDto.paymentStatus, e);
+                throw new IllegalArgumentException("Invalid payment status: " + invoiceInputDto.paymentStatus, e);
             }
         }
 
@@ -154,7 +155,7 @@ public class InvoiceService {
 
     @Transactional
     public Invoice patchInvoice(Long invoiceId, InvoiceInputDto updates) {
-        Invoice existingInvoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> new ResourceNotFoundException("Factuur niet gevonden met ID: " + invoiceId));
+        Invoice existingInvoice = invoiceRepository.findById(invoiceId).orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
 
         PaymentStatus originalStatus = existingInvoice.getPaymentStatus();
 
@@ -173,7 +174,7 @@ public class InvoiceService {
                     return processInvoicePayment(invoiceId);
                 }
             } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Ongeldige status van betaling voor patch: " + updates.paymentStatus, e);
+                throw new IllegalArgumentException("Invalid payment status for patch: " + updates.paymentStatus, e);
             }
         }
 
@@ -183,7 +184,7 @@ public class InvoiceService {
     @Transactional
     public void deleteInvoice(Long invoiceId){
         Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new ResourceNotFoundException("Factuur niet gevonden met ID: " + invoiceId));
+                .orElseThrow(() -> new ResourceNotFoundException("Invoice not found with ID: " + invoiceId));
 
         this.invoiceRepository.deleteById(invoiceId);
     }

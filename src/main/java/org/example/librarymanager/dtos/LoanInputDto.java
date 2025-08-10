@@ -12,6 +12,8 @@ public class LoanInputDto {
     @NotNull
     public LocalDate returnDate;
 
+    private LocalDate actualReturnDate;
+
     @NotNull
     public Boolean isReturned = false;
 

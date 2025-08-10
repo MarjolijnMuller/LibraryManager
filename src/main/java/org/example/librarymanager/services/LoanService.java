@@ -4,6 +4,7 @@ import org.example.librarymanager.config.FineConfiguration;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.dtos.LoanPatchDto;
+import org.example.librarymanager.exceptions.NotEnoughCopiesException;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.mappers.LoanMapper;
 import org.example.librarymanager.models.*;
@@ -36,6 +37,10 @@ public class LoanService {
         BookCopy bookCopy = bookCopyRepository.findById(loanInputDto.bookCopyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bookcopy not found with ID: " + loanInputDto.bookCopyId));
 
+        if (bookCopy.getStatus() != BookCopyStatus.AVAILABLE) {
+            throw new NotEnoughCopiesException("This book copy is not available for loan.");
+        }
+
         User user = userRepository.findById(loanInputDto.userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + loanInputDto.userId));
 
@@ -66,9 +71,11 @@ public class LoanService {
     }
 
     public LoanDto returnBookCopy(Long loanId) {
-        Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
+        Loan loan = loanRepository.findById(loanId)
+                .orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
+
         if (loan.getIsReturned()) {
-            throw new IllegalArgumentException("Loan already returned.");
+            throw new IllegalStateException("The book copy has already been returned.");
         }
 
         loan.setIsReturned(true);
@@ -79,20 +86,23 @@ public class LoanService {
         bookCopy.setStatus(BookCopyStatus.AVAILABLE);
         bookCopyRepository.save(bookCopy);
 
-        calculateAndSaveFine(savedLoan);
-        return LoanMapper.toResponseDto(loanRepository.save(loan));
+        Fine fine = calculateAndSaveFine(savedLoan);
+        if (fine != null) {
+            savedLoan.getFines().add(fine);
+        }
+        return LoanMapper.toResponseDto(savedLoan);
     }
 
     public Fine calculateAndSaveFine(Loan loan) {
         FineConfiguration config = fineConfigurationRepository.findById(1L)
-                .orElseThrow(() -> new IllegalStateException("Boete configuratie niet gevonden! Zorg ervoor dat deze is ingesteld in de database."));
+                .orElseThrow(() -> new IllegalStateException("Fine configuration not found! Make sure it is set up in the database."));
 
         LocalDate dueDate = loan.getReturnDate();
         LocalDate calculationDate = loan.getActualReturnDate() != null ? loan.getActualReturnDate() : LocalDate.now();
 
         if (calculationDate.isAfter(dueDate)) {
             long overdueDays = ChronoUnit.DAYS.between(dueDate, calculationDate);
-            double calculatedFineAmount = overdueDays * config.getDailyRate();
+            double calculatedFineAmount = overdueDays * config.getDailyFine();
 
             if (calculatedFineAmount > config.getMaxFineAmount()) {
                 calculatedFineAmount = config.getMaxFineAmount();
@@ -133,13 +143,13 @@ public class LoanService {
 
     public LoanDto updateLoan(Long loanId, LoanInputDto loanInputDto) {
         Loan existingLoan = loanRepository.findById(loanId)
-                .orElseThrow(() -> new ResourceNotFoundException("Lening niet gevonden met ID: " + loanId));
+                .orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
 
         BookCopy bookCopy = bookCopyRepository.findById(loanInputDto.bookCopyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Boekexemplaar niet gevonden met ID: " + loanInputDto.bookCopyId));
+                .orElseThrow(() -> new ResourceNotFoundException("Book copy not found with ID: " + loanInputDto.bookCopyId));
 
         User user = userRepository.findById(loanInputDto.userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Lid (User) niet gevonden met ID: " + loanInputDto.userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + loanInputDto.userId));
 
         boolean wasReturnedBeforeUpdate = existingLoan.getIsReturned();
 

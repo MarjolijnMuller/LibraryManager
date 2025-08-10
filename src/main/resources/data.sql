@@ -80,18 +80,18 @@ VALUES ('2024-01-15', 'Januari 2024', 25.50, 'PAID', 201),
 
 
 -- Insert loans
-INSERT INTO loans (loan_date, return_date, is_returned, book_copy_id, user_id)
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
 VALUES
-    ('2025-06-20', '2025-07-04', TRUE, 1, 201),
-    ('2025-06-20', '2025-07-04', TRUE, 7, 201),
-    ('2025-07-01', '2025-07-15', FALSE, 3, 202),
-    ('2025-07-05', '2025-07-19', FALSE, 5, 203),
-    ('2025-05-10', '2025-05-24', TRUE, 9, 204),
-    ('2025-07-08', '2025-07-22', FALSE, 11, 205),
-    ('2025-07-18', '2025-08-01', FALSE, 2, 201),
-    ('2025-07-17', '2025-07-25', FALSE, 4, 202),
-    ('2025-06-01', '2025-06-15', FALSE, 6, 203),
-    ('2025-06-25', '2025-07-10', FALSE, 10, 204);
+    ('2025-06-20', '2025-07-04', '2025-07-04', TRUE, 1, 201),
+    ('2025-06-20', '2025-07-04', NULL, TRUE, 7, 201),
+    ('2025-07-01', '2025-07-15', NULL, FALSE, 3, 202),
+    ('2025-07-05', '2025-07-19', NULL, FALSE, 5, 203),
+    ('2025-05-10', '2025-05-24', '2025-05-24', TRUE, 9, 204),
+    ('2025-07-08', '2025-07-22', NULL, FALSE, 11, 205),
+    ('2025-07-18', '2025-08-01', NULL, FALSE, 2, 201),
+    ('2025-07-17', '2025-07-25', NULL, FALSE, 4, 202),
+    ('2025-06-01', '2025-06-15', NULL, FALSE, 6, 203),
+    ('2025-06-25', '2025-07-10', NULL, FALSE, 10, 204);
 
 -- Insert fines
 INSERT INTO fines (fine_amount, fine_date, is_paid, is_ready_for_invoice, loan_id, invoice_id)
@@ -100,4 +100,7 @@ VALUES (2.50, '2025-07-05', FALSE, TRUE, 1, 1),
        (7.75, '2025-07-07', FALSE, TRUE, 1, 4),
        (3.00, '2025-07-06', FALSE, TRUE, 4, 3),
        (1.25, '2025-07-08', FALSE, TRUE, 5, 5),
-       (5.00, '2025-07-20', FALSE, TRUE, 6, NULL);
+       (5.00, '2025-07-20', FALSE, TRUE, 6, 6);
+
+INSERT INTO fine_configurations (id, daily_fine, max_fine_amount, last_updated_by, last_updated_at)
+VALUES (1, 0.50, 20.00, 'system', CURRENT_TIMESTAMP);
