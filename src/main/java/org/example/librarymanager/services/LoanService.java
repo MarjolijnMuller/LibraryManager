@@ -86,8 +86,11 @@ public class LoanService {
         bookCopy.setStatus(BookCopyStatus.AVAILABLE);
         bookCopyRepository.save(bookCopy);
 
-        calculateAndSaveFine(savedLoan);
-        return LoanMapper.toResponseDto(loanRepository.save(loan));
+        Fine fine = calculateAndSaveFine(savedLoan);
+        if (fine != null) {
+            savedLoan.getFines().add(fine);
+        }
+        return LoanMapper.toResponseDto(savedLoan);
     }
 
     public Fine calculateAndSaveFine(Loan loan) {
@@ -99,7 +102,7 @@ public class LoanService {
 
         if (calculationDate.isAfter(dueDate)) {
             long overdueDays = ChronoUnit.DAYS.between(dueDate, calculationDate);
-            double calculatedFineAmount = overdueDays * config.getDailyRate();
+            double calculatedFineAmount = overdueDays * config.getDailyFine();
 
             if (calculatedFineAmount > config.getMaxFineAmount()) {
                 calculatedFineAmount = config.getMaxFineAmount();

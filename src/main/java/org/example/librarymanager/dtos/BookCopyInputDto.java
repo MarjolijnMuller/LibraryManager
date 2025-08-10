@@ -6,7 +6,7 @@ import org.example.librarymanager.models.BookCopyStatus;
 
 public class BookCopyInputDto {
     @NotNull
-    public BookCopyStatus status;
+    public BookCopyStatus status = BookCopyStatus.AVAILABLE;
 
     @NotNull
     @Size(min = 10, max = 13)

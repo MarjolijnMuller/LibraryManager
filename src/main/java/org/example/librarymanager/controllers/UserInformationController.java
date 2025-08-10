@@ -43,9 +43,6 @@ public class UserInformationController {
     @GetMapping
     public ResponseEntity<List<UserInformationDto>> getAllUsers() {
         List<UserInformationDto> userInformations = userInformationService.getAllUsers();
-        if (userInformations.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
         return ResponseEntity.ok(userInformations);
     }
 
@@ -64,9 +61,6 @@ public class UserInformationController {
     @GetMapping("/members")
     public ResponseEntity<List<UserInformationDto>> getAllMembers() {
         List<UserInformationDto> members = userInformationService.getAllMembers();
-        if (members.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(members);
     }
 
@@ -85,9 +79,6 @@ public class UserInformationController {
     @GetMapping("/librarians")
     public ResponseEntity<List<UserInformationDto>> getAllLibrarians() {
         List<UserInformationDto> librarians = userInformationService.getAllLibrarians();
-        if (librarians.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(librarians);
     }
 

@@ -36,9 +36,6 @@ public class LoanController {
     @GetMapping
     public ResponseEntity<List<LoanDto>> getAllLoans() {
         List<LoanDto> loans = loanService.getAllLoans();
-        if (loans.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
         return ResponseEntity.ok(loans);
     }
 
@@ -51,36 +48,24 @@ public class LoanController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<LoanDto>> getLoansByUser(@PathVariable Long userId) {
         List<LoanDto> loans = loanService.getLoansByUserId(userId);
-        if (loans.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(loans);
     }
 
     @GetMapping("/bookcopy/{bookCopyId}")
     public ResponseEntity<List<LoanDto>> getLoansByBookCopy(@PathVariable Long bookCopyId) {
         List<LoanDto> loans = loanService.getLoansByBookCopyId(bookCopyId);
-        if (loans.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(loans);
     }
 
     @GetMapping("/overdue")
     public ResponseEntity<List<LoanDto>> getOverdueLoans() {
         List<LoanDto> loans = loanService.getOverdueLoans();
-        if (loans.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(loans);
     }
 
     @GetMapping("/outstanding")
     public ResponseEntity<List<LoanDto>> getOutstandingLoans() {
         List<LoanDto> loans = loanService.getOutstandingLoans();
-        if (loans.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
         return ResponseEntity.ok(loans);
     }
 

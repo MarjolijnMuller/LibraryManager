@@ -26,7 +26,7 @@ public class FineConfiguration {
 
     @NotNull
     @PositiveOrZero
-    private Double dailyRate;
+    private Double dailyFine;
 
     @NotNull
     @PositiveOrZero

@@ -35,10 +35,10 @@ public class InvoiceService {
     @Transactional
     public List<Invoice> generateInvoicesForReadyFines() {
         List<Fine> readyFines = fineRepository.findByIsReadyForInvoiceTrueAndIsPaidFalseAndInvoiceIsNull();
-        List<Invoice> generatedInvoices = new ArrayList<>();
+        List<Long> generatedInvoiceIds = new ArrayList<>();
 
         if (readyFines.isEmpty()) {
-            return generatedInvoices;
+            return new ArrayList<>();
         }
 
         Map<User, List<Fine>> finesByUser = readyFines.stream()
@@ -57,9 +57,10 @@ public class InvoiceService {
                 newInvoice.setInvoiceAmount(totalAmount);
                 newInvoice.setPaymentStatus(PaymentStatus.OPEN);
                 newInvoice.setUser(user);
+                newInvoice.setFines(userFines);
 
                 Invoice savedInvoice = invoiceRepository.save(newInvoice);
-                generatedInvoices.add(savedInvoice);
+                generatedInvoiceIds.add(savedInvoice.getInvoiceId());
 
                 for (Fine fine : userFines) {
                     fine.setInvoice(savedInvoice);
@@ -67,7 +68,8 @@ public class InvoiceService {
                 }
             }
         }
-        return generatedInvoices;
+
+        return invoiceRepository.findAllById(generatedInvoiceIds);
     }
 
     @Transactional
