@@ -1,7 +1,6 @@
 package org.example.librarymanager.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -38,8 +37,6 @@ public class User {
     @Size(min = 5, max = 250)
     private String password;
 
-
-
     @ManyToMany(fetch = FetchType.EAGER)
             @JoinTable(
                     name = "user_roles",
@@ -49,7 +46,7 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private UserInformation userInformation;
+    private Profile profile;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Loan> loans = new ArrayList<>();

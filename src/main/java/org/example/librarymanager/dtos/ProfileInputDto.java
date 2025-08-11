@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 
-public class UserInformationInputDto {
+public class ProfileInputDto {
     @NotNull
     @Size(min = 5, max = 50)
     public String username;

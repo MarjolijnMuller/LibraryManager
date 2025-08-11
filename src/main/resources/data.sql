@@ -1,7 +1,8 @@
 -- Insert roles
 INSERT INTO roles (rolename)
 VALUES ('ROLE_MEMBER'),
-       ('ROLE_LIBRARIAN');
+       ('ROLE_LIBRARIAN'),
+       ('ROLE_ADMIN');
 
 -- Insert books
 INSERT INTO books (title, author_first_name, author_last_name, isbn, publisher, category)
@@ -42,7 +43,7 @@ VALUES (101, 'emilylib', 'passwordEmily'),
        (205, 'petermember', 'passwordPeter');
 
 -- Insert users_information
-INSERT INTO users_information (user_information_id, user_id, first_name, last_name, street, house_number, postal_code, city, email, phone, profile_picture_url)
+INSERT INTO profile (profile_id, user_id, first_name, last_name, street, house_number, postal_code, city, email, phone, profile_picture_url)
 VALUES (1, 101, 'Emily', 'Clark', 'Bibliotheeklaan', '10', '1234AB', 'Amsterdam', 'emily.clark@example.com', '06-12345678', 'http://example.com/images/emily.jpg'),
        (2, 102, 'David', 'Jones', 'Leesplein', '5', '5678CD', 'Utrecht', 'david.jones@example.com', '06-87654321', 'http://example.com/images/david.jpg'),
        (3, 103, 'Sarah', 'Miller', 'Boekensteeg', '22', '9012EF', 'Rotterdam', 'sarah.miller@example.com', '06-11223344', 'http://example.com/images/sarah.jpg'),
@@ -53,8 +54,6 @@ VALUES (1, 101, 'Emily', 'Clark', 'Bibliotheeklaan', '10', '1234AB', 'Amsterdam'
        (8, 203, 'Michael', 'White', 'Nieuwstraat', '30', '3000EF', 'Rotterdam', 'michael.white@example.com', '0633445566', 'http://example.com/images/michael.jpg'),
        (9, 204, 'Olivia', 'Green', 'Dorpsweg', '8', '4000GH', 'Den Haag', 'olivia.green@example.com', '0644556677', 'http://example.com/images/olivia.jpg'),
        (10, 205, 'Peter', 'Black', 'Molenpad', '15B', '5000IJ', 'Eindhoven', 'peter.black@example.com', '0655667788', 'http://example.com/images/peter.jpg');
-
-SELECT setval('users_information_user_information_id_seq', (SELECT MAX(user_information_id) FROM users_information));
 
 -- Insert user_roles
 INSERT INTO user_roles (user_id, rolename)

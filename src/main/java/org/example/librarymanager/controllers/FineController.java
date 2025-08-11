@@ -34,12 +34,6 @@ public class FineController {
         return ResponseEntity.ok(fine);
     }
 
-    @GetMapping("/loan/{loanId}")
-    public ResponseEntity<List<FineDto>> getFineByLoanId(@PathVariable Long loanId) {
-        List<FineDto> fines = fineService.getFinesByLoanId(loanId);
-        return ResponseEntity.ok(fines);
-    }
-
     @GetMapping("/notPaid")
     public ResponseEntity<List<FineDto>> getNotPaidFines() {
         List<FineDto> fines = fineService.getFinesByNotPaid(false);

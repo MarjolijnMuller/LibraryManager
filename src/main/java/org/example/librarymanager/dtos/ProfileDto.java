@@ -1,4 +1,3 @@
-// UserInformationPatchDto.java
 package org.example.librarymanager.dtos;
 
 import lombok.Getter;
@@ -6,15 +5,14 @@ import lombok.Setter;
 
 import java.util.List;
 
-
 @Setter
 @Getter
-public class UserInformationPatchDto {
-
+public class ProfileDto {
+    public Long userId;
     public String username;
-    public String password;
     public List<String> roles;
 
+    public Long profileId;
     public String firstName;
     public String lastName;
     public String street;
