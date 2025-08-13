@@ -98,6 +98,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/books/**").hasAnyRole("LIBRARIAN", "ADMIN")
 
                         .requestMatchers("/fines", "/fines/**").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/invoices/user").authenticated()
                         .requestMatchers("/invoices", "/invoices/**").hasAnyRole("LIBRARIAN", "ADMIN")
 
                         .requestMatchers(HttpMethod.POST, "/profiles").hasAnyRole("LIBRARIAN", "ADMIN")

@@ -8,7 +8,9 @@ import org.example.librarymanager.models.PaymentStatus;
 import org.example.librarymanager.services.InvoiceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -81,6 +83,12 @@ public class InvoiceController {
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<InvoiceDto>> getMyInvoices(@AuthenticationPrincipal UserDetails userDetails) {
+        List<Invoice> invoices = invoiceService.getInvoicesByUsername(userDetails.getUsername());
+        return ResponseEntity.ok(InvoiceMapper.toResponseDtoList(invoices));
     }
 
     @PutMapping("/{id}")
