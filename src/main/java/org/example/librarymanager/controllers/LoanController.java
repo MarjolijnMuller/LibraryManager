@@ -4,13 +4,17 @@ import jakarta.validation.Valid;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.dtos.LoanPatchDto;
+import org.example.librarymanager.exceptions.AccessDeniedException;
+import org.example.librarymanager.security.UserDetailsImpl;
 import org.example.librarymanager.services.LoanService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/loans")
@@ -46,7 +50,15 @@ public class LoanController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<LoanDto>> getLoansByUser(@PathVariable Long userId) {
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or #userId == authentication.principal.id")
+    public ResponseEntity<List<LoanDto>> getLoansByUser(@PathVariable Long userId, Authentication authentication) {
+        Long currentUserId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
+
+        if (!userId.equals(currentUserId) && !authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_LIBRARIAN"))) {
+            throw new AccessDeniedException("Je hebt geen toegang om leningen van andere gebruikers te bekijken.");
+        }
+
         List<LoanDto> loans = loanService.getLoansByUserId(userId);
         return ResponseEntity.ok(loans);
     }

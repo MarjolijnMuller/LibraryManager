@@ -6,6 +6,8 @@ import org.example.librarymanager.dtos.ProfileInputDto;
 import org.example.librarymanager.dtos.ProfilePatchDto;
 import org.example.librarymanager.services.ProfileService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -35,8 +37,10 @@ public class ProfileController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<ProfileDto> getProfileById(@PathVariable Long userId) {
-        ProfileDto profileDto = profileService.getProfileById(userId);
+    public ResponseEntity<ProfileDto> getProfileById(
+            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        ProfileDto profileDto = profileService.getProfileById(userId, userDetails);
         return ResponseEntity.ok(profileDto);
     }
 
@@ -47,8 +51,11 @@ public class ProfileController {
     }
 
     @GetMapping("/username/{username}")
-    public ResponseEntity<ProfileDto> getProfileByUsername(@PathVariable String username) {
-        ProfileDto profileDto = profileService.getProfileByUsername(username);
+    public ResponseEntity<ProfileDto> getProfileByUsername(
+            @PathVariable String username,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        ProfileDto profileDto = profileService.getProfileByUsername(username, userDetails);
         return ResponseEntity.ok(profileDto);
     }
 
@@ -64,12 +71,6 @@ public class ProfileController {
         return ResponseEntity.ok(members);
     }
 
-    @GetMapping("/members/username/{username}")
-    public ResponseEntity<ProfileDto> getMemberByUsername(@PathVariable String username) {
-        ProfileDto member = profileService.getMemberByUsername(username);
-        return ResponseEntity.ok(member);
-    }
-
     @GetMapping("/librarians/{userId}")
     public ResponseEntity<ProfileDto> getLibrarianById(@PathVariable Long userId) {
         ProfileDto librarian = profileService.getLibrarianById(userId);
@@ -80,12 +81,6 @@ public class ProfileController {
     public ResponseEntity<List<ProfileDto>> getAllLibrarians() {
         List<ProfileDto> librarians = profileService.getAllLibrarians();
         return ResponseEntity.ok(librarians);
-    }
-
-    @GetMapping("/librarians/username/{username}")
-    public ResponseEntity<ProfileDto> getLibrarianByUsername(@PathVariable String username) {
-        ProfileDto librarian = profileService.getLibrarianByUsername(username);
-        return ResponseEntity.ok(librarian);
     }
 
     @PutMapping("/{userId}")

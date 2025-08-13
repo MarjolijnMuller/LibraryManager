@@ -3,6 +3,7 @@ package org.example.librarymanager.services;
 import org.example.librarymanager.dtos.ProfileDto;
 import org.example.librarymanager.dtos.ProfileInputDto;
 import org.example.librarymanager.dtos.ProfilePatchDto;
+import org.example.librarymanager.exceptions.AccessDeniedException;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
 import org.example.librarymanager.exceptions.UsernameAlreadyExistsException;
 import org.example.librarymanager.mappers.ProfileMapper;
@@ -12,6 +13,8 @@ import org.example.librarymanager.models.Profile;
 import org.example.librarymanager.repositories.RoleRepository;
 import org.example.librarymanager.repositories.ProfileRepository;
 import org.example.librarymanager.repositories.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -19,6 +22,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.security.core.GrantedAuthority;
+
 
 @Service
 public class ProfileService {
@@ -26,12 +31,14 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final RoleRepository roleRepository;
     private final ProfileMapper profileMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public ProfileService(UserRepository userRepository, ProfileRepository profileRepository, RoleRepository roleRepository, ProfileMapper profileMapper) {
+    public ProfileService(UserRepository userRepository, ProfileRepository profileRepository, RoleRepository roleRepository, ProfileMapper profileMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.roleRepository = roleRepository;
         this.profileMapper = profileMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public ProfileDto createProfile(ProfileInputDto profileInputDto) {
@@ -42,8 +49,7 @@ public class ProfileService {
 
         User newUser = new User();
         newUser.setUsername(profileInputDto.username);
-        newUser.setPassword(profileInputDto.password);
-        // TODO: wachtwoord beveiligen, hier moet een passwordEncoder komen
+        newUser.setPassword(passwordEncoder.encode(profileInputDto.password));
 
         Set<Role> assignedRoles = new HashSet<>();
         if (profileInputDto.roles != null && !profileInputDto.roles.isEmpty()) {
@@ -62,8 +68,10 @@ public class ProfileService {
         }
         newUser.setRoles(assignedRoles);
 
+        // Eerst de User opslaan om een ID te krijgen
         newUser = userRepository.save(newUser);
 
+        // Gebruik de zojuist opgeslagen User om het Profile aan te maken
         Profile newUserInfo = new Profile(
                 newUser,
                 profileInputDto.firstName,
@@ -77,19 +85,31 @@ public class ProfileService {
         );
         newUserInfo.setProfilePictureUrl(profileInputDto.profilePictureUrl);
 
+        // Nu de Profile opslaan. De ID wordt automatisch gekoppeld via de User-entiteit.
         Profile savedUserInfo = profileRepository.save(newUserInfo);
 
-        savedUserInfo.setUser(newUser);
-        newUser.setProfile(savedUserInfo);
-        userRepository.save(newUser);
-
         return profileMapper.toResponseDto(savedUserInfo);
-
     }
 
-    public ProfileDto getProfileById(Long userId){
-        Profile profile = profileRepository.findByUser_UserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
-        return profileMapper.toResponseDto(profile);
+    public ProfileDto getProfileById(Long userId, UserDetails userDetails){
+        // Check of de ingelogde gebruiker een bevoorrechte rol heeft
+        boolean hasPrivilegedRole = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN") || auth.equals("ROLE_LIBRARIAN"));
+
+        // Zoek het profiel op basis van userId
+        Profile profile = profileRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
+
+        // Haal de User-entiteit op om de gebruikersnaam te vergelijken
+        User profileUser = profile.getUser();
+
+        // Check of de ingelogde gebruiker toegang heeft
+        if (hasPrivilegedRole || userDetails.getUsername().equals(profileUser.getUsername())) {
+            return profileMapper.toResponseDto(profile);
+        } else {
+            throw new AccessDeniedException("You do not have permission to view this profile.");
+        }
     }
 
     public List<ProfileDto> getAllProfiles() {
@@ -97,16 +117,45 @@ public class ProfileService {
         return profileMapper.toResponseDtoList(profiles);
     }
 
-    public ProfileDto getProfileByUsername(String username) {
-        Profile profile = profileRepository.findByUser_UsernameIgnoreCase(username).orElseThrow(() -> new ResourceNotFoundException("User not found with username " + username));
+    public ProfileDto getProfileByUsername(String username, UserDetails userDetails) {
+        boolean hasAdminOrLibrarianRole = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(auth -> auth.equals("ROLE_ADMIN") || auth.equals("ROLE_LIBRARIAN"));
+
+        if (userDetails.getUsername().equals(username) || hasAdminOrLibrarianRole) {
+            Profile profile = profileRepository.findByUser_UsernameIgnoreCase(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("Profile not found for username: " + username));
+
+            return profileMapper.toResponseDto(profile);
+        } else {
+            throw new AccessDeniedException("You do not have permission to view this profile.");
+        }
+    }
+
+    public Long getUserIdByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        return user.getUserId();
+    }
+
+    public ProfileDto getMemberById(Long userId) {
+        // Zoek het profiel op basis van de userId
+        Profile profile = profileRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Member not found with id " + userId));
+
+        if (!profile.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER"))) {
+            throw new ResourceNotFoundException("User with id " + userId + " is not a member.");
+        }
         return profileMapper.toResponseDto(profile);
     }
 
-    public ProfileDto getMemberById(Long id) {
-        Profile profile = profileRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Member not found with id " + id));
-        if (!profile.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER"))) {
-            throw new ResourceNotFoundException("User with id " + id + " is not a member.");
+    public ProfileDto getLibrarianById(Long userId) {
+        // Zoek het profiel op basis van de userId
+        Profile profile = profileRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Librarian not found with id " + userId));
+
+        if (!profile.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"))) {
+            throw new ResourceNotFoundException("User with id " + userId + " is not a librarian.");
         }
         return profileMapper.toResponseDto(profile);
     }
@@ -118,40 +167,11 @@ public class ProfileService {
         return profileMapper.toResponseDtoList(members);
     }
 
-    public ProfileDto getMemberByUsername(String username) {
-        Profile profile = profileRepository.findByUser_UsernameIgnoreCase(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Member with username " + username + " not found."));
-
-        if (!profile.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER"))) {
-            throw new ResourceNotFoundException("User with username " + username + " is not a member.");
-        }
-        return profileMapper.toResponseDto(profile);
-    }
-
-    public ProfileDto getLibrarianById(Long id) {
-        Profile profile = profileRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Librarian not found with id " + id));
-        if (!profile.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"))) {
-            throw new ResourceNotFoundException("User with id " + id + " is not a librarian.");
-        }
-        return profileMapper.toResponseDto(profile);
-    }
-
     public List<ProfileDto> getAllLibrarians() {
         List<Profile> librarians = profileRepository.findAll().stream()
                 .filter(ui -> ui.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN")))
                 .collect(Collectors.toList());
         return profileMapper.toResponseDtoList(librarians);
-    }
-
-    public ProfileDto getLibrarianByUsername(String username) {
-        Profile profile = profileRepository.findByUser_UsernameIgnoreCase(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Librarian with username " + username + " not found."));
-
-        if (!profile.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"))) {
-            throw new ResourceNotFoundException("User with username " + username + " is not a librarian.");
-        }
-        return profileMapper.toResponseDto(profile);
     }
 
     public ProfileDto updateProfile(Long userId, ProfileInputDto profileInputDto) {
@@ -190,8 +210,7 @@ public class ProfileService {
         }
 
         if (profileInputDto.password != null && !profileInputDto.password.isEmpty()) {
-            user.setPassword(profileInputDto.password);
-            // TODO: wachtwoord beveiligen
+            user.setPassword(passwordEncoder.encode(profileInputDto.password));
         }
 
         if (profileInputDto.roles != null) {
@@ -255,8 +274,7 @@ public class ProfileService {
         }
 
         if (profilePatchDto.getPassword() != null && !profilePatchDto.getPassword().isEmpty()) {
-            user.setPassword(profilePatchDto.getPassword());
-            // TODO: wachtwoord beveiligen (bijvoorbeeld met BCryptPasswordEncoder)
+            user.setPassword(passwordEncoder.encode(profilePatchDto.getPassword()));
         }
 
         if (profilePatchDto.getRoles() != null) {
