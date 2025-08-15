@@ -9,6 +9,8 @@ import org.example.librarymanager.security.UserDetailsImpl;
 import org.example.librarymanager.services.LoanService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -49,16 +51,17 @@ public class LoanController {
         return ResponseEntity.ok(loan);
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<LoanDto>> getMyLoans(@AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        List<LoanDto> loans = loanService.getLoansByUsername(username);
+        return ResponseEntity.ok(loans);
+    }
+
     @GetMapping("/user/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or #userId == authentication.principal.id")
     public ResponseEntity<List<LoanDto>> getLoansByUser(@PathVariable Long userId, Authentication authentication) {
-        Long currentUserId = ((UserDetailsImpl) authentication.getPrincipal()).getId();
-
-        if (!userId.equals(currentUserId) && !authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_LIBRARIAN"))) {
-            throw new AccessDeniedException("Je hebt geen toegang om leningen van andere gebruikers te bekijken.");
-        }
-
+        // Deze logica wordt overgenomen door de AuthorizationManager, dus u kunt deze code verwijderen.
+        // De beveiliging is al geregeld op het niveau van de SecurityConfig.
         List<LoanDto> loans = loanService.getLoansByUserId(userId);
         return ResponseEntity.ok(loans);
     }
