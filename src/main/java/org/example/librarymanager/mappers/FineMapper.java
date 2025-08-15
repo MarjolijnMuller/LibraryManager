@@ -26,13 +26,9 @@ public class FineMapper {
         fineDto.fineAmount = fine.getFineAmount();
         fineDto.fineDate = fine.getFineDate();
         fineDto.isPaid = fine.getIsPaid();
-        fineDto.isReadyForInvoice = fine.getIsReadyForInvoice();
 
         if (fine.getLoan() != null) {
             fineDto.loanId = fine.getLoan().getLoanId();
-        }
-        if (fine.getInvoice() != null) {
-            fineDto.invoiceId = fine.getInvoice().getInvoiceId();
         }
         return fineDto;
     }

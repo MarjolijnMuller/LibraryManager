@@ -2,6 +2,7 @@ package org.example.librarymanager.repositories;
 
 import org.example.librarymanager.models.Invoice;
 import org.example.librarymanager.models.PaymentStatus;
+import org.example.librarymanager.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -18,4 +19,5 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     List<Invoice> findByInvoicePeriodIgnoreCase(String invoicePeriod);
     List<Invoice> findByPaymentStatus(PaymentStatus paymentStatus);
+    List<Invoice> findByUser(User user);
 }

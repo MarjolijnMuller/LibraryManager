@@ -125,6 +125,12 @@ public class InvoiceService {
         return this.invoiceRepository.findByPaymentStatus(paymentStatus);
     }
 
+    public List<Invoice> getInvoicesByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        return invoiceRepository.findByUser(user);
+    }
+
     @Transactional
     public Invoice updateInvoice(Long invoiceId, InvoiceInputDto invoiceInputDto){
         Invoice existingInvoice = invoiceRepository.findById(invoiceId)

@@ -9,20 +9,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
-@Table(name = "users_information")
+@Table(name = "profile")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class UserInformation {
+public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_information_id")
+    @Column(name = "profileId")
     private long id;
 
     @NotNull
@@ -58,11 +55,11 @@ public class UserInformation {
 
     private String profilePictureUrl;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "userId", unique = true, nullable = false)
     private User user;
 
-    public UserInformation(User user, String firstName, String lastName, String street, String houseNumber, String postalCode, String city, String phone, String email) {
+    public Profile(User user, String firstName, String lastName, String street, String houseNumber, String postalCode, String city, String phone, String email) {
         this.user = user;
         this.firstName = firstName;
         this.lastName = lastName;

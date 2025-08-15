@@ -1,24 +1,23 @@
 package org.example.librarymanager.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.Set;
 
 @Entity
 @Table(name="roles")
 
 @Getter
 @Setter
-@AllArgsConstructor
+@RequiredArgsConstructor
 @NoArgsConstructor
-
 public class Role {
     @Id
-    @Column(nullable = false, unique = true)
+    @NonNull
     private String rolename;
+
+    @ManyToMany(mappedBy = "roles")
+    private Set<User> users;
+
 }

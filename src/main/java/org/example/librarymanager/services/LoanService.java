@@ -70,6 +70,16 @@ public class LoanService {
         return LoanMapper.toResponseDtoList(loanRepository.findByUser(user));
     }
 
+    public boolean isLoanOwner(Long loanId, Long userId) {
+        return loanRepository.existsByLoanIdAndUser_UserId(loanId, userId);
+    }
+
+    public List<LoanDto> getLoansByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
+        return LoanMapper.toResponseDtoList(loanRepository.findByUser(user));
+    }
+
     public LoanDto returnBookCopy(Long loanId) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
