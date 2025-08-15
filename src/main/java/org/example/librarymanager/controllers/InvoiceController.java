@@ -6,12 +6,15 @@ import org.example.librarymanager.mappers.InvoiceMapper;
 import org.example.librarymanager.models.Invoice;
 import org.example.librarymanager.models.PaymentStatus;
 import org.example.librarymanager.services.InvoiceService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -36,6 +39,22 @@ public class InvoiceController {
     public ResponseEntity<InvoiceDto> getInvoiceById(@PathVariable("id") Long id) {
         Invoice invoice = invoiceService.getInvoiceById(id);
         return ResponseEntity.ok(InvoiceMapper.toResponseDto(invoice));
+    }
+
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> getInvoicePdf(@PathVariable("id") Long id) {
+        try {
+            byte[] pdfBytes = invoiceService.generateInvoicePdf(id);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "invoice_" + id + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/generate")

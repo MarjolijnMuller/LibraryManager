@@ -7,6 +7,9 @@ import org.example.librarymanager.dtos.LoanPatchDto;
 import org.example.librarymanager.exceptions.AccessDeniedException;
 import org.example.librarymanager.security.UserDetailsImpl;
 import org.example.librarymanager.services.LoanService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import org.springframework.security.core.Authentication;
@@ -49,6 +53,22 @@ public class LoanController {
     public ResponseEntity<LoanDto> getLoanById(@PathVariable Long loanId) {
         LoanDto loan = loanService.getLoanById(loanId);
         return ResponseEntity.ok(loan);
+    }
+
+    @GetMapping("/{loanId}/pdf")
+    public ResponseEntity<byte[]> getLoanReceiptPdf(@PathVariable Long loanId) {
+        try {
+            byte[] pdfBytes = loanService.generateLoanReceiptPdf(loanId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "loanreceipt_" + loanId + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return ResponseEntity.ok().headers(headers).body(pdfBytes);
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/user")

@@ -20,4 +20,5 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Invoice> findByInvoicePeriodIgnoreCase(String invoicePeriod);
     List<Invoice> findByPaymentStatus(PaymentStatus paymentStatus);
     List<Invoice> findByUser(User user);
+    boolean existsByInvoiceIdAndUser_Username(Long invoiceId, String username);
 }
