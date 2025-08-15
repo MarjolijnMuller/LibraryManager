@@ -1,5 +1,6 @@
 package org.example.librarymanager.services;
 
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.example.librarymanager.config.FineConfiguration;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
@@ -11,6 +12,7 @@ import org.example.librarymanager.models.*;
 import org.example.librarymanager.repositories.*;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -23,14 +25,16 @@ public class LoanService {
     private final UserRepository userRepository;
     private final FineRepository fineRepository;
     private final FineConfigurationRepository fineConfigurationRepository;
+    private final PdfService pdfService;
 
 
-    public LoanService(LoanRepository loanRepository, BookCopyRepository bookCopyRepository, UserRepository userRepository, FineRepository fineRepository, FineConfigurationRepository fineConfigurationRepository) {
+    public LoanService(LoanRepository loanRepository, BookCopyRepository bookCopyRepository, UserRepository userRepository, FineRepository fineRepository, FineConfigurationRepository fineConfigurationRepository, PdfService pdfService) {
         this.loanRepository = loanRepository;
         this.bookCopyRepository = bookCopyRepository;
         this.userRepository = userRepository;
         this.fineRepository = fineRepository;
         this.fineConfigurationRepository = fineConfigurationRepository;
+        this.pdfService = pdfService;
     }
 
     public LoanDto createLoan(LoanInputDto loanInputDto) {
@@ -192,18 +196,28 @@ public class LoanService {
         return LoanMapper.toResponseDto(loanRepository.save(existingLoan));
     }
 
-    public void updateOverdueFines() {
-        List<Loan> overdueLoans = loanRepository.findByReturnDateBeforeAndIsReturnedFalse(LocalDate.now());
-        for (Loan loan : overdueLoans) {
-            Optional<Fine> existingFine = loan.getFines().stream().findFirst();
-            if (existingFine.isPresent()) {
-                if (!existingFine.get().getIsReadyForInvoice()) {
-                    calculateAndSaveFine(loan);
-                }
-            } else {
-                calculateAndSaveFine(loan);
-            }
-        }
+    public byte[] generateLoanReceiptPdf(Long loanId) throws IOException {
+        Loan loan = loanRepository.findById(loanId).orElseThrow(() -> new ResourceNotFoundException("Loan not found with ID: " + loanId));
+
+        return pdfService.generatePdf(contentStream -> {
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 18);
+            contentStream.newLineAtOffset(50, 750);
+            contentStream.showText("Leenbon");
+            contentStream.endText();
+
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA, 12);
+            contentStream.newLineAtOffset(50, 700);
+            contentStream.showText("Klant: " + loan.getUser().getProfile().getFirstName() + " " + loan.getUser().getProfile().getLastName());
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Geleend boek: " + loan.getBookCopy().getBook().getTitle());
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Uitleendatum: " + loan.getLoanDate());
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Verwachte retourdatum: " + loan.getReturnDate());
+            contentStream.endText();
+        });
     }
 
 

@@ -1,5 +1,6 @@
 package org.example.librarymanager.services;
 
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.example.librarymanager.dtos.InvoiceInputDto;
 import org.example.librarymanager.exceptions.InvoiceAlreadyPaidException;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
@@ -14,6 +15,7 @@ import org.example.librarymanager.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +27,13 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final FineRepository fineRepository;
     private final UserRepository userRepository;
+    private final PdfService pdfService;
 
-    public InvoiceService(InvoiceRepository invoiceRepository, FineRepository fineRepository, UserRepository userRepository) {
+    public InvoiceService(InvoiceRepository invoiceRepository, FineRepository fineRepository, UserRepository userRepository, PdfService pdfService) {
         this.invoiceRepository = invoiceRepository;
         this.fineRepository = fineRepository;
         this.userRepository = userRepository;
+        this.pdfService = pdfService;
     }
 
     @Transactional
@@ -129,6 +133,56 @@ public class InvoiceService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with username: " + username));
         return invoiceRepository.findByUser(user);
+    }
+
+    public byte[] generateInvoicePdf(Long invoiceId) throws IOException {
+        Invoice invoice = getInvoiceById(invoiceId);
+        List<Fine> fines = fineRepository.findByInvoice(invoice);
+
+        return pdfService.generatePdf(contentStream -> {
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 18);
+            contentStream.newLineAtOffset(50, 750);
+            contentStream.showText("Factuur #" + invoice.getInvoiceId());
+            contentStream.endText();
+
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA, 12);
+            contentStream.newLineAtOffset(50, 700);
+            contentStream.showText("Factuurdatum: " + invoice.getInvoiceDate());
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Periode: " + invoice.getInvoicePeriod());
+            contentStream.newLineAtOffset(0, -20);
+            contentStream.showText("Klant: " + invoice.getUser().getProfile().getFirstName() + " " + invoice.getUser().getProfile().getLastName());
+            contentStream.endText();
+
+            // Toevoegen van de boetes
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
+            contentStream.newLineAtOffset(50, 650);
+            contentStream.showText("Boetes:");
+            contentStream.endText();
+
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA, 12);
+            contentStream.newLineAtOffset(50, 630);
+            for (Fine fine : fines) {
+                contentStream.showText("Boek: " + fine.getLoan().getBookCopy().getBook().getTitle() + " - bedrag: €" + String.format("%.2f", fine.getFineAmount()));
+                contentStream.newLineAtOffset(0, -20);
+            }
+            contentStream.endText();
+
+            // Toevoegen van het totaalbedrag
+            contentStream.beginText();
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 14);
+            contentStream.newLineAtOffset(50, 580);
+            contentStream.showText("Totaal te betalen: €" + String.format("%.2f", invoice.getInvoiceAmount()));
+            contentStream.endText();
+        });
+    }
+
+    public boolean isInvoiceOwner(Long invoiceId, String username) {
+        return invoiceRepository.existsByInvoiceIdAndUser_Username(invoiceId, username);
     }
 
     @Transactional
