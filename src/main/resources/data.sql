@@ -1,28 +1,45 @@
--- Insert roles
+-- data.sql
+
+-- Verwijder bestaande data. De volgorde is belangrijk vanwege foreign keys.
+DELETE FROM user_roles;
+DELETE FROM fines;
+DELETE FROM loans;
+DELETE FROM book_copies;
+DELETE FROM books;
+DELETE FROM users;
+DELETE FROM roles;
+DELETE FROM fine_configurations;
+DELETE FROM profile;
+DELETE FROM invoices;
+
+-- Zorg ervoor dat de ID's vastliggen voor voorspelbare testen door de teller te resetten.
+ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1;
+ALTER TABLE books ALTER COLUMN book_id RESTART WITH 1;
+ALTER TABLE book_copies ALTER COLUMN book_copy_id RESTART WITH 1;
+ALTER TABLE loans ALTER COLUMN loan_id RESTART WITH 1;
+ALTER TABLE fines ALTER COLUMN fine_id RESTART WITH 1;
+ALTER TABLE invoices ALTER COLUMN invoice_id RESTART WITH 1;
+
+-- De rest van je INSERT statements
 INSERT INTO roles (rolename)
 VALUES ('ROLE_MEMBER'),
        ('ROLE_LIBRARIAN'),
        ('ROLE_ADMIN');
 
--- Insert users
 INSERT INTO users (username, password)
 VALUES
-        --admin
-       ('admin', '$2a$10$HSkg99GUXUUlwOavURKyfu2xuPSgVRWTUolnChcD2ZROuemIqkyQS'), -- Wachtwoord: admin123
-       --librarians
-       ('emilylib', '$2a$10$lk.TulcClA9jGcVdAYaSb.7A8JFryBpPDDLo1wvgnFX/NkvHEG8I6'), -- Wachtwoord: passwordEmily
-       ('davidlib', '$2a$10$snzesRJ3cmueopRbgZleJuWWSHHShm.K3ToPe7v0y2bdjz0KSTqZC'), -- Wachtwoord: passwordDavid
-       ('sarahlib', '$2a$10$JngqkUPrtfyOCA9RjB5lz.XnQzNXLpMF8IsYK54.NNkyy.LdwYgni'), -- Wachtwoord: passwordSarah
-       ('chrislib', '$2a$10$ValRdN3RfiKzXyHIsQpPdOWCM/w4cxEx1VtQqPI.j9kmUpjdrHHiW'), -- Wachtwoord: passwordChris
-       ('lisalib', '$2a$10$VCFDUwsI8TB0KLzyeM3/Ue3BbfU2ba/zDR95WAziMGK9cP02hf2mW'), -- Wachtwoord: passwordLisa
-       --members
-       ('adamember', '$2a$10$8m8CxL1FtBwS5/xgKhJ/yuPuRlTEi5kh0ZIwl6tzYdTnH0nGSs/Xy'), -- Wachtwoord: passwordAdam
-       ('ellenmember', '$2a$10$4AMC/j78Lt5sjvgmr2rwwOMBWoEsOkgPuwC0m6xMb8I3gYC6/6XEK'), -- Wachtwoord: passwordEllen
-       ('michaelmember', '$2a$10$NJqM3e0ODFf4yb5trVjXnOA/NZFpFD4auRqCiNJWuGhbVhNJH4m.G'), -- Wachtwoord: passwordMichael
-       ('oliviamember', '$2a$10$IHxBjC5AZns1KIebWBJ7ZuNfJzMN54QDU9234mPbaGp.iJDzS3h8O'), -- Wachtwoord: passwordOlivia
-       ('petermember', '$2a$10$N5P5ocYfr8zQauzczB3k5OTRrV7tpwPVL/52kQhI/GUTJJxaCPhZi'); -- Wachtwoord: passwordPeter
+    ('admin', '$2a$10$HSkg99GUXUUlwOavURKyfu2xuPSgVRWTUolnChcD2ZROuemIqkyQS'),
+    ('emilylib', '$2a$10$lk.TulcClA9jGcVdAYaSb.7A8JFryBpPDDLo1wvgnFX/NkvHEG8I6'),
+    ('davidlib', '$2a$10$snzesRJ3cmueopRbgZleJuWWSHHShm.K3ToPe7v0y2bdjz0KSTqZC'),
+    ('sarahlib', '$2a$10$JngqkUPrtfyOCA9RjB5lz.XnQzNXLpMF8IsYK54.NNkyy.LdwYgni'),
+    ('chrislib', '$2a$10$ValRdN3RfiKzXyHIsQpPdOWCM/w4cxEx1VtQqPI.j9kmUpjdrHHiW'),
+    ('lisalib', '$2a$10$VCFDUwsI8TB0KLzyeM3/Ue3BbfU2ba/zDR95WAziMGK9cP02hf2mW'),
+    ('adamember', '$2a$10$8m8CxL1FtBwS5/xgKhJ/yuPuRlTEi5kh0ZIwl6tzYdTnH0nGSs/Xy'),
+    ('ellenmember', '$2a$10$4AMC/j78Lt5sjvgmr2rwwOMBWoEsOkgPuwC0m6xMb8I3gYC6/6XEK'),
+    ('michaelmember', '$2a$10$NJqM3e0ODFf4yb5trVjXnOA/NZFpFD4auRqCiNJWuGhbVhNJH4m.G'),
+    ('oliviamember', '$2a$10$IHxBjC5AZns1KIebWBJ7ZuNfJzMN54QDU9234mPbaGp.iJDzS3h8O'),
+    ('petermember', '$2a$10$N5P5ocYfr8zQauzczB3k5OTRrV7tpwPVL/52kQhI/GUTJJxaCPhZi');
 
--- Insert books
 INSERT INTO books (title, author_first_name, author_last_name, isbn, publisher, category)
 VALUES ('The Hitchhiker''s Guide to the Galaxy', 'Douglas', 'Adams', '9780345391803', 'Del Rey', 'FICTION'),
        ('The Name of the Wind', 'Patrick', 'Rothfuss', '9780756404741', 'DAW Books', 'FICTION'),
@@ -32,7 +49,6 @@ VALUES ('The Hitchhiker''s Guide to the Galaxy', 'Douglas', 'Adams', '9780345391
        ('Cosmos', 'Carl', 'Sagan', '9780345539434', 'Ballantine Books', 'SCIENCE'),
        ('A People''s History of the United States', 'Howard', 'Zinn', '9780060528379', 'Harper Perennial', 'HISTORY');
 
--- Insert book copies
 INSERT INTO book_copies (book_id, follow_number, status)
 VALUES (1, 1, 'AVAILABLE'),
        (1, 2, 'ON_LOAN'),
@@ -47,7 +63,6 @@ VALUES (1, 1, 'AVAILABLE'),
        (6, 1, 'AVAILABLE'),
        (7, 1, 'IN_REPAIR');
 
--- Insert user_roles using a single combined statement
 INSERT INTO user_roles (user_id, rolename)
 SELECT u.user_id, r.rolename
 FROM users u, (VALUES ('admin', 'ROLE_ADMIN'),
@@ -64,7 +79,6 @@ FROM users u, (VALUES ('admin', 'ROLE_ADMIN'),
 ) as r(username, rolename)
 WHERE u.username = r.username;
 
--- Insert profile
 INSERT INTO profile (user_id, first_name, last_name, street, house_number, postal_code, city, email, phone, profile_picture_url)
 SELECT user_id, 'Admin', 'User', 'Adminstraat', '1', '0000AA', 'Amsterdam', 'admin@example.com', '06-00000000', 'http://example.com/images/admin.jpg' FROM users WHERE username = 'admin'
 UNION ALL
@@ -88,50 +102,39 @@ SELECT user_id, 'Olivia', 'Green', 'Dorpsweg', '8', '4000GH', 'Den Haag', 'olivi
 UNION ALL
 SELECT user_id, 'Peter', 'Black', 'Molenpad', '15B', '5000IJ', 'Eindhoven', 'peter.black@example.com', '0655667788', 'http://example.com/images/peter.jpg' FROM users WHERE username = 'petermember';
 
--- Insert invoices
-INSERT INTO invoices (invoice_date, invoice_period, invoice_amount, payment_status, user_id)
-SELECT '2024-01-15'::date, 'Januari 2024', 25.50, 'PAID', user_id FROM users WHERE username = 'adamember'
-UNION ALL
-SELECT '2024-02-10'::date, 'Februari 2024', 15.00, 'PENDING', user_id FROM users WHERE username = 'ellenmember'
-UNION ALL
-SELECT '2024-03-05'::date, 'Maart 2024', 30.75, 'OVERDUE', user_id FROM users WHERE username = 'michaelmember'
-UNION ALL
-SELECT '2024-04-20'::date, 'April 2024', 10.00, 'PAID', user_id FROM users WHERE username = 'oliviamember'
-UNION ALL
-SELECT '2024-05-25'::date, 'Mei 2024', 45.99, 'PENDING', user_id FROM users WHERE username = 'petermember'
-UNION ALL
-SELECT '2024-06-12'::date, 'Juni 2024', 5.25, 'OVERDUE', user_id FROM users WHERE username = 'adamember';
-
--- Insert loans
 INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
-SELECT '2025-06-20'::date, '2025-07-04'::date, '2025-07-04'::date, TRUE, 1, user_id FROM users WHERE username = 'adamember'
-UNION ALL
-SELECT '2025-06-20'::date, '2025-07-04'::date, NULL, TRUE, 7, user_id FROM users WHERE username = 'adamember'
-UNION ALL
-SELECT '2025-07-01'::date, '2025-07-15'::date, NULL, FALSE, 3, user_id FROM users WHERE username = 'ellenmember'
-UNION ALL
-SELECT '2025-07-05'::date, '2025-07-19'::date, NULL, FALSE, 5, user_id FROM users WHERE username = 'michaelmember'
-UNION ALL
-SELECT '2025-05-10'::date, '2025-05-24'::date, '2025-05-24'::date, TRUE, 9, user_id FROM users WHERE username = 'oliviamember'
-UNION ALL
-SELECT '2025-07-08'::date, '2025-07-22'::date, NULL, FALSE, 11, user_id FROM users WHERE username = 'petermember'
-UNION ALL
-SELECT '2025-07-18'::date, '2025-08-01'::date, NULL, FALSE, 2, user_id FROM users WHERE username = 'adamember'
-UNION ALL
-SELECT '2025-07-17'::date, '2025-07-25'::date, NULL, FALSE, 4, user_id FROM users WHERE username = 'ellenmember'
-UNION ALL
-SELECT '2025-06-01'::date, '2025-06-15'::date, NULL, FALSE, 6, user_id FROM users WHERE username = 'michaelmember'
-UNION ALL
-SELECT '2025-06-25'::date, '2025-07-10'::date, NULL, FALSE, 10, user_id FROM users WHERE username = 'oliviamember';
+SELECT '2025-06-01'::date, '2025-06-15'::date, '2025-06-20'::date, TRUE, 1, user_id FROM users WHERE username = 'adamember';
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-07-05'::date, '2025-07-19'::date, '2025-07-27'::date, TRUE, 5, user_id FROM users WHERE username = 'michaelmember';
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-07-17'::date, '2025-07-25'::date, '2025-07-27'::date, TRUE, 4, user_id FROM users WHERE username = 'ellenmember';
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-07-01'::date, '2025-07-15'::date, '2025-07-25'::date, TRUE, 3, user_id FROM users WHERE username = 'adamember';
 
--- Insert fines
 INSERT INTO fines (fine_amount, fine_date, is_paid, is_ready_for_invoice, loan_id, invoice_id)
-VALUES (2.50, '2025-07-05'::date, FALSE, TRUE, 1, 1),
-       (10.00, '2025-07-01'::date, TRUE, TRUE, 1, 1),
-       (7.75, '2025-07-07'::date, FALSE, TRUE, 1, 4),
-       (3.00, '2025-07-06'::date, FALSE, TRUE, 4, 3),
-       (1.25, '2025-07-08'::date, FALSE, TRUE, 5, 5),
-       (5.00, '2025-07-20'::date, FALSE, TRUE, 6, 6);
+SELECT 2.50, '2025-06-20'::date, FALSE, TRUE, loan_id, NULL FROM loans WHERE user_id = (SELECT user_id FROM users WHERE username = 'adamember') AND actual_return_date = '2025-06-20';
+INSERT INTO fines (fine_amount, fine_date, is_paid, is_ready_for_invoice, loan_id, invoice_id)
+SELECT 4.00, '2025-07-27'::date, FALSE, TRUE, loan_id, NULL FROM loans WHERE user_id = (SELECT user_id FROM users WHERE username = 'michaelmember') AND actual_return_date = '2025-07-27';
+INSERT INTO fines (fine_amount, fine_date, is_paid, is_ready_for_invoice, loan_id, invoice_id)
+SELECT 1.00, '2025-07-27'::date, FALSE, TRUE, loan_id, NULL FROM loans WHERE user_id = (SELECT user_id FROM users WHERE username = 'ellenmember') AND actual_return_date = '2025-07-27';
+INSERT INTO fines (fine_amount, fine_date, is_paid, is_ready_for_invoice, loan_id, invoice_id)
+SELECT 5.00, '2025-07-25'::date, FALSE, TRUE, loan_id, NULL FROM loans WHERE user_id = (SELECT user_id FROM users WHERE username = 'adamember') AND actual_return_date = '2025-07-25';
+
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-06-01'::date, '2025-06-15'::date, '2025-06-14'::date, TRUE, 6, user_id FROM users WHERE username = 'michaelmember';
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-07-01'::date, '2025-07-15'::date, '2025-07-15'::date, TRUE, 2, user_id FROM users WHERE username = 'oliviamember';
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-07-05'::date, '2025-07-19'::date, '2025-07-18'::date, TRUE, 8, user_id FROM users WHERE username = 'petermember';
+
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-08-10'::date, '2025-08-24'::date, NULL, FALSE, 3, user_id FROM users WHERE username = 'ellenmember';
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-08-12'::date, '2025-08-26'::date, NULL, FALSE, 9, user_id FROM users WHERE username = 'oliviamember';
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-08-14'::date, '2025-08-28'::date, NULL, FALSE, 11, user_id FROM users WHERE username = 'petermember';
+INSERT INTO loans (loan_date, return_date, actual_return_date, is_returned, book_copy_id, user_id)
+SELECT '2025-07-15'::date, '2025-07-29'::date, NULL, FALSE, 12, user_id FROM users WHERE username = 'petermember';
 
 INSERT INTO fine_configurations (id, daily_fine, max_fine_amount, last_updated_by, last_updated_at)
 VALUES (1, 0.50, 20.00, 'system', CURRENT_TIMESTAMP);
