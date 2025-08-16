@@ -2,14 +2,13 @@ package org.example.librarymanager.dtos;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-
 
 @Setter
 @Getter
 public class ProfilePatchDto {
-
     public String username;
     public String password;
     public List<String> roles;
@@ -23,5 +22,6 @@ public class ProfilePatchDto {
 
     public String email;
     public String phone;
-    public String profilePictureUrl;
+
+    public MultipartFile profilePictureFile;
 }

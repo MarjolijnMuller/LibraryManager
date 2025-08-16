@@ -22,5 +22,5 @@ public class ProfileDto {
 
     public String email;
     public String phone;
-    public String profilePictureUrl;
+    public String profilePictureFile;
 }

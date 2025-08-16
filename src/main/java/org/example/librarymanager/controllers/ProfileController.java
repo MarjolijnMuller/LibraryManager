@@ -9,7 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.net.URI;
 import java.util.List;
@@ -90,9 +93,21 @@ public class ProfileController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<ProfileDto> patchProfile(@PathVariable Long userId, @Valid @RequestBody ProfilePatchDto profilePatchDto) {
+    public ResponseEntity<ProfileDto> patchProfile(
+            @PathVariable Long userId,
+            @Valid @ModelAttribute ProfilePatchDto profilePatchDto) {
+
         ProfileDto patchedProfile = profileService.patchProfile(profilePatchDto, userId);
         return ResponseEntity.ok(patchedProfile);
+    }
+
+    @PatchMapping(value = "/{userId}/photo", consumes = "multipart/form-data")
+    public ResponseEntity<ProfileDto> uploadProfilePhoto(
+            @PathVariable Long userId,
+            @RequestParam("file") MultipartFile file) {
+
+        ProfileDto updatedProfile = profileService.uploadProfilePhoto(userId, file);
+        return ResponseEntity.ok(updatedProfile);
     }
 
     @DeleteMapping("/{userId}")

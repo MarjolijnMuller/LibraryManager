@@ -16,7 +16,6 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    //TODO: secret-key beveiligt opslaan
     private final static String SECRET_KEY = "8g4kNskKFm04jI8hFjIE9E8FHe7SfuEHf9SHFuEfhuSIe8ehf";
 
     private Key getSigningKey() {
