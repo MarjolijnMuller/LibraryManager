@@ -402,6 +402,25 @@ class FineServiceTest {
     }
 
     @Test
+    void patchFine_UpdateFineDateOnly_UpdatesFine() {
+        // Arrange
+        Fine existingFine = createFine(1L, 10.0, false, null, null);
+        FinePatchDto patchDto = new FinePatchDto();
+        patchDto.fineDate = LocalDate.of(2024, 1, 1);
+
+        when(fineRepository.findById(1L)).thenReturn(Optional.of(existingFine));
+        when(fineRepository.save(any(Fine.class))).thenReturn(existingFine);
+
+        // Act
+        fineService.patchFine(1L, patchDto);
+
+        // Assert
+        assertEquals(LocalDate.of(2024, 1, 1), existingFine.getFineDate());
+        verify(fineRepository).findById(1L);
+        verify(fineRepository).save(existingFine);
+    }
+
+    @Test
     void patchFine_FineNotFound_ThrowsException() {
         FinePatchDto patchDto = new FinePatchDto();
         when(fineRepository.findById(anyLong())).thenReturn(Optional.empty());
@@ -437,6 +456,29 @@ class FineServiceTest {
         verify(fineRepository).findById(1L);
         verify(invoiceRepository).findById(99L);
         verify(fineRepository, never()).save(any(Fine.class));
+    }
+
+    @Test
+    void patchFine_RemoveInvoice_SetsInvoiceToNull() {
+        // Arrange
+        Long fineId = 1L;
+        Fine existingFine = new Fine();
+        existingFine.setFineId(fineId);
+        existingFine.setInvoice(new Invoice()); // Belangrijk: koppel een factuur aan de bestaande boete
+
+        FinePatchDto patchDto = new FinePatchDto();
+        patchDto.invoiceId = null; // Stel de invoiceId in op null
+
+        when(fineRepository.findById(fineId)).thenReturn(Optional.of(existingFine));
+        when(fineRepository.save(existingFine)).thenReturn(existingFine);
+
+        // Act
+        fineService.patchFine(fineId, patchDto);
+
+        // Assert
+        verify(fineRepository).findById(fineId);
+        verify(fineRepository).save(existingFine);
+        assertNull(existingFine.getInvoice());
     }
     // endregion
 
