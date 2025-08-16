@@ -4,7 +4,6 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.example.librarymanager.dtos.InvoiceInputDto;
 import org.example.librarymanager.exceptions.InvoiceAlreadyPaidException;
 import org.example.librarymanager.exceptions.ResourceNotFoundException;
-import org.example.librarymanager.mappers.InvoiceMapper;
 import org.example.librarymanager.models.Fine;
 import org.example.librarymanager.models.Invoice;
 import org.example.librarymanager.models.PaymentStatus;
@@ -156,7 +155,6 @@ public class InvoiceService {
             contentStream.showText("Klant: " + invoice.getUser().getProfile().getFirstName() + " " + invoice.getUser().getProfile().getLastName());
             contentStream.endText();
 
-            // Toevoegen van de boetes
             contentStream.beginText();
             contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
             contentStream.newLineAtOffset(50, 650);
@@ -172,7 +170,6 @@ public class InvoiceService {
             }
             contentStream.endText();
 
-            // Toevoegen van het totaalbedrag
             contentStream.beginText();
             contentStream.setFont(PDType1Font.HELVETICA_BOLD, 14);
             contentStream.newLineAtOffset(50, 580);

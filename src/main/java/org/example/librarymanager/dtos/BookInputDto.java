@@ -2,7 +2,6 @@ package org.example.librarymanager.dtos;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import org.example.librarymanager.models.BookCategory;
 
 public class BookInputDto {
     @NotNull

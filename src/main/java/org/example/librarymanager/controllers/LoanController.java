@@ -4,14 +4,11 @@ import jakarta.validation.Valid;
 import org.example.librarymanager.dtos.LoanDto;
 import org.example.librarymanager.dtos.LoanInputDto;
 import org.example.librarymanager.dtos.LoanPatchDto;
-import org.example.librarymanager.exceptions.AccessDeniedException;
-import org.example.librarymanager.security.UserDetailsImpl;
 import org.example.librarymanager.services.LoanService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -80,8 +77,6 @@ public class LoanController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<LoanDto>> getLoansByUser(@PathVariable Long userId, Authentication authentication) {
-        // Deze logica wordt overgenomen door de AuthorizationManager, dus u kunt deze code verwijderen.
-        // De beveiliging is al geregeld op het niveau van de SecurityConfig.
         List<LoanDto> loans = loanService.getLoansByUserId(userId);
         return ResponseEntity.ok(loans);
     }

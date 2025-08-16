@@ -35,7 +35,6 @@ public class LoanMapper {
             loanDto.userId = loan.getUser().getUserId();
         }
         if (loan.getFines() != null && !loan.getFines().isEmpty()) {
-            //TODO: lijst met fines
             loanDto.fineId = loan.getFines().get(0).getFineId();
         }
 

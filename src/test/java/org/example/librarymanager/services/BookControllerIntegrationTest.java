@@ -1,7 +1,7 @@
 package org.example.librarymanager.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.librarymanager.dtos.BookCopyDto; // Let op de import
+import org.example.librarymanager.dtos.BookCopyDto;
 import org.example.librarymanager.dtos.BookCopyInputDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +52,8 @@ class BookControllerIntegrationTest {
         // Assert
         String createdBookCopyJson = result.getResponse().getContentAsString();
 
-        // Gebruik de BookCopyDto om de respons te mappen
         BookCopyDto createdBookResponse = objectMapper.readValue(createdBookCopyJson, BookCopyDto.class);
 
-        // Pas de assertions aan om de nieuwe DTO te gebruiken
         assertEquals("The New Test Book", createdBookResponse.bookTitle);
         assertEquals("New Author", createdBookResponse.bookAuthor);
         assertEquals(1L, createdBookResponse.followNumber);

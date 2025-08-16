@@ -1,6 +1,3 @@
--- data.sql
-
--- Verwijder bestaande data. De volgorde is belangrijk vanwege foreign keys.
 DELETE FROM user_roles;
 DELETE FROM fines;
 DELETE FROM loans;
@@ -12,7 +9,6 @@ DELETE FROM fine_configurations;
 DELETE FROM profile;
 DELETE FROM invoices;
 
--- Zorg ervoor dat de ID's vastliggen voor voorspelbare testen door de teller te resetten.
 ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1;
 ALTER TABLE books ALTER COLUMN book_id RESTART WITH 1;
 ALTER TABLE book_copies ALTER COLUMN book_copy_id RESTART WITH 1;
@@ -20,7 +16,6 @@ ALTER TABLE loans ALTER COLUMN loan_id RESTART WITH 1;
 ALTER TABLE fines ALTER COLUMN fine_id RESTART WITH 1;
 ALTER TABLE invoices ALTER COLUMN invoice_id RESTART WITH 1;
 
--- De rest van je INSERT statements
 INSERT INTO roles (rolename)
 VALUES ('ROLE_MEMBER'),
        ('ROLE_LIBRARIAN'),

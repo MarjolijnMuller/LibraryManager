@@ -148,23 +148,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
 
-                        // Books and Book Copies
                         .requestMatchers(HttpMethod.GET, "/books", "/books/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/books", "/books/copies").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/books/**").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/books/**").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/books/**").hasAnyRole("LIBRARIAN", "ADMIN")
 
-                        // Fines
                         .requestMatchers("/fines", "/fines/**").hasAnyRole("LIBRARIAN", "ADMIN")
 
-                        // Invoices
                         .requestMatchers(HttpMethod.GET,"/invoices/user").authenticated()
                         .requestMatchers(HttpMethod.GET, "/invoices/{id}").access(invoiceOwnerAuthorizationManager())
                         .requestMatchers(HttpMethod.GET, "/invoices/{id}/pdf").access(invoiceOwnerAuthorizationManager())
                         .requestMatchers("/invoices", "/invoices/**").hasAnyRole("LIBRARIAN", "ADMIN")
 
-                        // Profiles
                         .requestMatchers(HttpMethod.POST, "/profiles").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/profiles/members", "/profiles/members/**", "/profiles/librarians", "/profiles/librarians/**").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/profiles").hasAnyRole("LIBRARIAN", "ADMIN")
@@ -173,7 +169,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/profiles/**").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/profiles/**").hasRole("ADMIN")
 
-                        // Loans
                         .requestMatchers(HttpMethod.GET, "/loans/user").authenticated()
                         .requestMatchers(HttpMethod.GET, "/loans/user/{userId}").access(profileOwnerAuthorizationManager())
                         .requestMatchers(HttpMethod.PATCH, "/loans/{loanId}/return").access(loanOwnerAuthorizationManager())

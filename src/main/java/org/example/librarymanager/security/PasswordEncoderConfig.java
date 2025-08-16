@@ -1,5 +1,3 @@
-// src/main/java/org/example/librarymanager/security/PasswordEncoderConfig.java
-
 package org.example.librarymanager.security;
 
 import org.springframework.context.annotation.Bean;

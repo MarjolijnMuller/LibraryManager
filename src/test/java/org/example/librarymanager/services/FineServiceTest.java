@@ -40,7 +40,6 @@ class FineServiceTest {
     @InjectMocks
     private FineService fineService;
 
-    // Hulpfuncties om test-objecten te creëren
     private Fine createFine(Long fineId, Double fineAmount, Boolean isPaid, Loan loan, Invoice invoice) {
         Fine fine = new Fine();
         fine.setFineId(fineId);
@@ -64,7 +63,6 @@ class FineServiceTest {
         return invoice;
     }
 
-    // region GET tests
     @Test
     void getAllFines_ReturnsAllFines() {
         Fine fine1 = createFine(1L, 10.0, false, null, null);
@@ -156,9 +154,7 @@ class FineServiceTest {
         assertEquals(1, result.size());
         verify(fineRepository).findByIsPaidFalse();
     }
-    // endregion
 
-    // region paidFine tests
     @Test
     void paidFine_FineFoundAndNotPaid_UpdatesFine() {
         Fine fine1 = createFine(1L, 10.0, false, null, null);
@@ -191,9 +187,7 @@ class FineServiceTest {
         verify(fineRepository).findById(1L);
         verify(fineRepository, never()).save(any(Fine.class));
     }
-    // endregion
 
-    // region updateFine tests
     @Test
     void updateFine_AllFieldsUpdated_UpdatesFine() {
         Fine existingFine = createFine(1L, 10.0, false, createLoan(1L), createInvoice(1L));
@@ -226,7 +220,7 @@ class FineServiceTest {
     }
 
     @Test
-    void updateFine_UpdatesLoanOnly_UpdatesFine() { // Dekt regel 66
+    void updateFine_UpdatesLoanOnly_UpdatesFine() {
         Fine existingFine = createFine(1L, 10.0, false, createLoan(1L), null);
         FineInputDto updateDto = new FineInputDto();
         updateDto.loanId = 2L;
@@ -248,7 +242,7 @@ class FineServiceTest {
     }
 
     @Test
-    void updateFine_UpdatesInvoiceOnly_UpdatesFine() { // Dekt regel 70
+    void updateFine_UpdatesInvoiceOnly_UpdatesFine() {
         Fine existingFine = createFine(1L, 10.0, false, createLoan(1L), null);
         FineInputDto updateDto = new FineInputDto();
         updateDto.invoiceId = 2L;
@@ -270,7 +264,7 @@ class FineServiceTest {
     }
 
     @Test
-    void updateFine_UpdateInvoiceToNull_UpdatesFine() { // Dekt regel 73
+    void updateFine_UpdateInvoiceToNull_UpdatesFine() {
         Fine existingFine = createFine(1L, 10.0, false, createLoan(1L), createInvoice(1L));
         FineInputDto updateDto = new FineInputDto();
         updateDto.invoiceId = null;
@@ -326,9 +320,7 @@ class FineServiceTest {
         verify(invoiceRepository).findById(99L);
         verify(fineRepository, never()).save(any(Fine.class));
     }
-    // endregion
 
-    // region patchFine tests
     @Test
     void patchFine_PartialFieldsUpdated_UpdatesFine() {
         Fine existingFine = createFine(1L, 10.0, false, createLoan(1L), createInvoice(1L));
@@ -348,7 +340,7 @@ class FineServiceTest {
     }
 
     @Test
-    void patchFine_UpdatesLoanOnly_UpdatesFine() { // Dekt regel 89
+    void patchFine_UpdatesLoanOnly_UpdatesFine() {
         Fine existingFine = createFine(1L, 10.0, false, createLoan(1L), null);
         FinePatchDto patchDto = new FinePatchDto();
         patchDto.loanId = 2L;
@@ -367,7 +359,7 @@ class FineServiceTest {
     }
 
     @Test
-    void patchFine_UpdatesInvoiceOnly_UpdatesFine() { // Dekt regel 92
+    void patchFine_UpdatesInvoiceOnly_UpdatesFine() {
         Fine existingFine = createFine(1L, 10.0, false, createLoan(1L), null);
         FinePatchDto patchDto = new FinePatchDto();
         patchDto.invoiceId = 2L;
@@ -386,7 +378,7 @@ class FineServiceTest {
     }
 
     @Test
-    void patchFine_UpdateInvoiceToNull_UpdatesFine() { // Dekt regel 90 en 102
+    void patchFine_UpdateInvoiceToNull_UpdatesFine() {
         Fine existingFine = createFine(1L, 10.0, false, createLoan(1L), createInvoice(1L));
         FinePatchDto patchDto = new FinePatchDto();
         patchDto.invoiceId = null;
@@ -464,10 +456,10 @@ class FineServiceTest {
         Long fineId = 1L;
         Fine existingFine = new Fine();
         existingFine.setFineId(fineId);
-        existingFine.setInvoice(new Invoice()); // Belangrijk: koppel een factuur aan de bestaande boete
+        existingFine.setInvoice(new Invoice());
 
         FinePatchDto patchDto = new FinePatchDto();
-        patchDto.invoiceId = null; // Stel de invoiceId in op null
+        patchDto.invoiceId = null;
 
         when(fineRepository.findById(fineId)).thenReturn(Optional.of(existingFine));
         when(fineRepository.save(existingFine)).thenReturn(existingFine);
@@ -480,9 +472,7 @@ class FineServiceTest {
         verify(fineRepository).save(existingFine);
         assertNull(existingFine.getInvoice());
     }
-    // endregion
 
-    // region deleteFine tests
     @Test
     void deleteFine_FineFound_DeletesFine() {
         when(fineRepository.existsById(1L)).thenReturn(true);
@@ -502,5 +492,5 @@ class FineServiceTest {
         verify(fineRepository).existsById(1L);
         verify(fineRepository, never()).deleteById(anyLong());
     }
-    // endregion
+
 }

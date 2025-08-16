@@ -52,7 +52,6 @@ class ProfileServiceTest {
     @InjectMocks
     private ProfileService profileService;
 
-    // Helper methods for creating test objects
     private User createUser(Long userId, String username, String password, Set<Role> roles) {
         User user = new User();
         user.setUserId(userId);
@@ -88,7 +87,6 @@ class ProfileServiceTest {
         );
     }
 
-    // region createProfile tests
     @Test
     void createProfile_UsernameAlreadyExists_ThrowsException() {
         try (MockedStatic<ProfileMapper> mockedStaticMapper = mockStatic(ProfileMapper.class)) {
@@ -119,7 +117,6 @@ class ProfileServiceTest {
             Profile newProfile = createProfile(newUser, "John");
             ProfileDto expectedDto = createProfileDto(1L, "testuser");
 
-            // Mock de afhankelijkheden
             when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
             when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
             when(roleRepository.findById("ROLE_ADMIN")).thenReturn(Optional.of(adminRole));
@@ -149,7 +146,7 @@ class ProfileServiceTest {
             ProfileInputDto inputDto = new ProfileInputDto();
             inputDto.username = "testuser";
             inputDto.password = "password123";
-            inputDto.roles = Collections.emptySet(); // Geen rollen opgegeven
+            inputDto.roles = Collections.emptySet();
 
             Role memberRole = new Role("ROLE_MEMBER");
             User newUser = createUser(1L, "testuser", "encodedPassword", Collections.singleton(memberRole));
@@ -194,9 +191,7 @@ class ProfileServiceTest {
             mockedStaticMapper.verifyNoInteractions();
         }
     }
-    // endregion
 
-    // region getProfileById tests
     @Test
     void getProfileById_UserIsAdmin_ReturnsProfile() {
         try (MockedStatic<ProfileMapper> mockedStaticMapper = mockStatic(ProfileMapper.class)) {
@@ -292,9 +287,7 @@ class ProfileServiceTest {
             mockedStaticMapper.verifyNoInteractions();
         }
     }
-    // endregion
 
-    // region other GET methods tests
     @Test
     void getAllProfiles_ReturnsAllProfiles() {
         try (MockedStatic<ProfileMapper> mockedStaticMapper = mockStatic(ProfileMapper.class)) {
@@ -583,28 +576,25 @@ class ProfileServiceTest {
             mockedStaticMapper.verify(() -> ProfileMapper.toResponseDtoList(List.of(librarianProfile)), times(1));
         }
     }
-    // endregion
 
-    // region updateProfile tests
-    // updateProfile_AllFieldsUpdated_UpdatesProfileAndUser
     @Test
     void updateProfile_AllFieldsUpdated_UpdatesProfileAndUser() {
         try (MockedStatic<ProfileMapper> mockedStaticMapper = mockStatic(ProfileMapper.class)) {
             // Arrange
             User existingUser = createUser(1L, "oldUsername", "oldPass", null);
             Profile existingProfile = createProfile(existingUser, "OldName");
-            existingProfile.setEmail("old.email@test.com"); // Set an old value
-            existingProfile.setProfilePictureUrl("old_url"); // Set an old value
-            existingProfile.setPhone("12345"); // Set an old value
+            existingProfile.setEmail("old.email@test.com");
+            existingProfile.setProfilePictureUrl("old_url");
+            existingProfile.setPhone("12345");
             existingUser.setProfile(existingProfile);
 
             ProfileInputDto inputDto = new ProfileInputDto();
             inputDto.username = "newUsername";
             inputDto.password = "newPass";
             inputDto.firstName = "NewName";
-            inputDto.email = "new.email@test.com"; // Raakt regel 184
-            inputDto.profilePictureUrl = "new_url"; // Raakt regel 195 (enkel in de code die je eerder stuurde)
-            inputDto.phone = "98765"; // Raakt regel 201 (enkel in de code die je eerder stuurde)
+            inputDto.email = "new.email@test.com";
+            inputDto.profilePictureUrl = "new_url";
+            inputDto.phone = "98765";
             inputDto.roles = Collections.singleton("ADMIN");
 
             Role adminRole = new Role("ROLE_ADMIN");
@@ -646,7 +636,7 @@ class ProfileServiceTest {
             // Arrange
             User existingUser = createUser(1L, "oldUsername", "oldPass", null);
             Profile existingProfile = createProfile(existingUser, "OldName");
-            existingProfile.setProfilePictureUrl("old_url"); // Set an old value
+            existingProfile.setProfilePictureUrl("old_url");
             existingUser.setProfile(existingProfile);
 
             ProfileInputDto inputDto = new ProfileInputDto();
@@ -691,7 +681,6 @@ class ProfileServiceTest {
             // Act & Assert
             assertThrows(UsernameAlreadyExistsException.class, () -> profileService.updateProfile(1L, inputDto));
             verify(userRepository).findById(1L);
-            // De volgende regel is aangepast om `times(2)` te verwachten
             verify(userRepository, times(2)).findByUsername("otherUser");
             verify(userRepository, never()).save(any(User.class));
             mockedStaticMapper.verifyNoInteractions();
@@ -719,7 +708,6 @@ class ProfileServiceTest {
         User userWithoutProfile = new User();
         userWithoutProfile.setUserId(1L);
         userWithoutProfile.setUsername("testuser");
-        // existingProfile is hier null, wat de fout zal triggeren
 
         ProfileInputDto inputDto = new ProfileInputDto();
 
@@ -731,10 +719,7 @@ class ProfileServiceTest {
         verify(profileRepository, never()).save(any(Profile.class));
         verify(userRepository, never()).save(any(User.class));
     }
-    // endregion
 
-    // region patchProfile tests
-    // patchProfile_AllFieldsUpdated_UpdatesProfileAndUser
     @Test
     void patchProfile_AllFieldsUpdated_UpdatesProfileAndUser() {
         try (MockedStatic<ProfileMapper> mockedStaticMapper = mockStatic(ProfileMapper.class)) {
@@ -753,14 +738,14 @@ class ProfileServiceTest {
 
             ProfilePatchDto patchDto = new ProfilePatchDto();
             patchDto.setFirstName("NewFirst");
-            patchDto.setLastName("NewLast"); // Raakt regel 247
-            patchDto.setStreet("NewStreet"); // Raakt regel 250
-            patchDto.setHouseNumber("2B"); // Raakt regel 253
-            patchDto.setPostalCode("5678CD"); // Raakt regel 256
-            patchDto.setCity("NewCity"); // Raakt regel 259
-            patchDto.setPhone("98765"); // Raakt regel 262
-            patchDto.setEmail("new@test.com"); // Raakt regel 265
-            patchDto.setProfilePictureUrl("new_url"); // Raakt regel 268
+            patchDto.setLastName("NewLast");
+            patchDto.setStreet("NewStreet");
+            patchDto.setHouseNumber("2B");
+            patchDto.setPostalCode("5678CD");
+            patchDto.setCity("NewCity");
+            patchDto.setPhone("98765");
+            patchDto.setEmail("new@test.com");
+            patchDto.setProfilePictureUrl("new_url");
             patchDto.setUsername("newUsername");
             patchDto.setPassword("newPass");
             patchDto.setRoles(Collections.singletonList("ADMIN"));
@@ -853,7 +838,6 @@ class ProfileServiceTest {
             // Act & Assert
             assertThrows(UsernameAlreadyExistsException.class, () -> profileService.patchProfile(patchDto, 1L));
             verify(userRepository).findById(1L);
-            // De volgende regel is aangepast om `times(2)` te verwachten
             verify(userRepository, times(2)).findByUsername("otherUser");
             verify(userRepository, never()).save(any(User.class));
             mockedStaticMapper.verifyNoInteractions();
@@ -882,7 +866,6 @@ class ProfileServiceTest {
             User existingUser = new User();
             existingUser.setUserId(1L);
             existingUser.setUsername("test");
-            // Profile is null
 
             ProfilePatchDto patchDto = new ProfilePatchDto();
 
@@ -905,7 +888,7 @@ class ProfileServiceTest {
             existingUser.setProfile(existingProfile);
 
             ProfilePatchDto patchDto = new ProfilePatchDto();
-            patchDto.setRoles(Collections.singletonList("LIBRARIAN")); // Trigger lines 281-285
+            patchDto.setRoles(Collections.singletonList("LIBRARIAN"));
 
             Role librarianRole = new Role("ROLE_LIBRARIAN");
 
@@ -925,9 +908,6 @@ class ProfileServiceTest {
         }
     }
 
-    // endregion
-
-    // region deleteProfile tests
     @Test
     void deleteProfile_UserExists_DeletesUser() {
         try (MockedStatic<ProfileMapper> mockedStaticMapper = mockStatic(ProfileMapper.class)) {
@@ -959,5 +939,4 @@ class ProfileServiceTest {
             mockedStaticMapper.verifyNoInteractions();
         }
     }
-    // endregion
 }

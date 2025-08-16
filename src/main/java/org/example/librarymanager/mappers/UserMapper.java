@@ -1,7 +1,6 @@
 package org.example.librarymanager.mappers;
 
 import org.example.librarymanager.dtos.UserDto;
-import org.example.librarymanager.dtos.UserInputDto;
 import org.example.librarymanager.models.User;
 import org.example.librarymanager.models.Role;
 import org.springframework.stereotype.Component;

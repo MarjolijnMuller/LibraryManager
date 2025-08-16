@@ -11,8 +11,6 @@ import java.util.Optional;
 public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
     Optional<BookCopy> findTopByBookOrderByFollowNumberDesc(Book book);
 
-    long countByBook(Book book);
-
     List<BookCopy> findBookCopiesByStatus(BookCopyStatus status);
 
     List<BookCopy> findBookCopiesByBook(Book book);

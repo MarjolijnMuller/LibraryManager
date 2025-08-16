@@ -11,8 +11,6 @@ import java.util.Optional;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
     List<Loan> findByUser(User user);
-    List<Loan> findByUser_UserId(Long userId);
-
     List<Loan> findByBookCopy(BookCopy bookCopy);
 
     List<Loan> findByIsReturnedFalse();
