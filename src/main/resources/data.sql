@@ -74,7 +74,7 @@ FROM users u, (VALUES ('admin', 'ROLE_ADMIN'),
 ) as r(username, rolename)
 WHERE u.username = r.username;
 
-INSERT INTO profile (user_id, first_name, last_name, street, house_number, postal_code, city, email, phone, profile_picture_url)
+INSERT INTO profile (user_id, first_name, last_name, street, house_number, postal_code, city, email, phone, profile_picture_file)
 SELECT user_id, 'Admin', 'User', 'Adminstraat', '1', '0000AA', 'Amsterdam', 'admin@example.com', '06-00000000', 'http://example.com/images/admin.jpg' FROM users WHERE username = 'admin'
 UNION ALL
 SELECT user_id, 'Emily', 'Clark', 'Bibliotheeklaan', '10', '1234AB', 'Amsterdam', 'emily.clark@example.com', '06-12345678', 'http://example.com/images/emily.jpg' FROM users WHERE username = 'emilylib'

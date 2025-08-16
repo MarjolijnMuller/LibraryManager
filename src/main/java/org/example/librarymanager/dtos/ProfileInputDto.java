@@ -3,9 +3,14 @@ package org.example.librarymanager.dtos;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ProfileInputDto {
     @NotNull
     @Size(min = 5, max = 50)
@@ -46,5 +51,5 @@ public class ProfileInputDto {
 
     public String phone;
 
-    public String profilePictureUrl;
+    public MultipartFile profilePictureFile;
 }

@@ -53,7 +53,7 @@ public class Profile {
     private String phone;
 
 
-    private String profilePictureUrl;
+    private String profilePictureFile;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "userId", unique = true, nullable = false)

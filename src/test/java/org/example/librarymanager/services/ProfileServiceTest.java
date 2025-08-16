@@ -19,10 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -48,9 +50,13 @@ class ProfileServiceTest {
     private RoleRepository roleRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private StorageService storageService;
+
 
     @InjectMocks
     private ProfileService profileService;
+
 
     private User createUser(Long userId, String username, String password, Set<Role> roles) {
         User user = new User();
@@ -584,7 +590,7 @@ class ProfileServiceTest {
             User existingUser = createUser(1L, "oldUsername", "oldPass", null);
             Profile existingProfile = createProfile(existingUser, "OldName");
             existingProfile.setEmail("old.email@test.com");
-            existingProfile.setProfilePictureUrl("old_url");
+            existingProfile.setProfilePictureFile("old_url");
             existingProfile.setPhone("12345");
             existingUser.setProfile(existingProfile);
 
@@ -593,7 +599,7 @@ class ProfileServiceTest {
             inputDto.password = "newPass";
             inputDto.firstName = "NewName";
             inputDto.email = "new.email@test.com";
-            inputDto.profilePictureUrl = "new_url";
+
             inputDto.phone = "98765";
             inputDto.roles = Collections.singleton("ADMIN");
 
@@ -606,7 +612,8 @@ class ProfileServiceTest {
             when(roleRepository.findById("ROLE_ADMIN")).thenReturn(Optional.of(adminRole));
             when(profileRepository.save(any(Profile.class))).thenReturn(existingProfile);
             when(userRepository.save(any(User.class))).thenReturn(existingUser);
-            mockedStaticMapper.when(() -> ProfileMapper.toResponseDto(existingProfile)).thenReturn(expectedDto);
+
+            mockedStaticMapper.when(() -> ProfileMapper.toResponseDto(any(Profile.class))).thenReturn(expectedDto);
 
             // Act
             ProfileDto result = profileService.updateProfile(1L, inputDto);
@@ -616,7 +623,7 @@ class ProfileServiceTest {
             assertEquals("encodedNewPass", existingUser.getPassword());
             assertEquals("NewName", existingProfile.getFirstName());
             assertEquals("new.email@test.com", existingProfile.getEmail());
-            assertEquals("new_url", existingProfile.getProfilePictureUrl());
+            assertEquals("old_url", existingProfile.getProfilePictureFile());
             assertEquals("98765", existingProfile.getPhone());
             assertTrue(existingUser.getRoles().contains(adminRole));
             assertEquals(expectedDto, result);
@@ -626,9 +633,12 @@ class ProfileServiceTest {
             verify(roleRepository).findById("ROLE_ADMIN");
             verify(profileRepository).save(existingProfile);
             verify(userRepository).save(existingUser);
-            mockedStaticMapper.verify(() -> ProfileMapper.toResponseDto(existingProfile), times(1));
+            verify(storageService, never()).store(any(MultipartFile.class));
+            mockedStaticMapper.verify(() -> ProfileMapper.toResponseDto(any(Profile.class)), times(1));
         }
     }
+
+
 
     @Test
     void updateProfile_SpecificFieldsUpdated_UpdatesProfile() {
@@ -636,13 +646,14 @@ class ProfileServiceTest {
             // Arrange
             User existingUser = createUser(1L, "oldUsername", "oldPass", null);
             Profile existingProfile = createProfile(existingUser, "OldName");
-            existingProfile.setProfilePictureUrl("old_url");
+            existingProfile.setProfilePictureFile("old_url");
             existingUser.setProfile(existingProfile);
 
             ProfileInputDto inputDto = new ProfileInputDto();
             inputDto.email = "new.email@example.com";
             inputDto.phone = "1234567890";
-            inputDto.profilePictureUrl = "new_url";
+
+            inputDto.profilePictureFile = null;
 
             ProfileDto expectedDto = createProfileDto(1L, "oldUsername");
 
@@ -657,12 +668,24 @@ class ProfileServiceTest {
             // Assert
             assertEquals("new.email@example.com", existingProfile.getEmail());
             assertEquals("1234567890", existingProfile.getPhone());
-            assertEquals("new_url", existingProfile.getProfilePictureUrl());
+            assertEquals("old_url", existingProfile.getProfilePictureFile());
             verify(profileRepository).save(existingProfile);
             verify(userRepository).save(existingUser);
+            verify(userRepository).findById(1L);
+            mockedStaticMapper.verify(() -> ProfileMapper.toResponseDto(existingProfile), times(1));
         }
     }
 
+    private static void extracted(ProfileInputDto inputDto) {
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "filename.jpg",
+                "image/jpeg",
+                "some content".getBytes()
+        );
+
+        inputDto.setProfilePictureFile(mockFile);
+    }
     @Test
     void updateProfile_UsernameAlreadyExists_ThrowsException() {
         try (MockedStatic<ProfileMapper> mockedStaticMapper = mockStatic(ProfileMapper.class)) {
@@ -733,7 +756,7 @@ class ProfileServiceTest {
             existingProfile.setCity("OldCity");
             existingProfile.setPhone("12345");
             existingProfile.setEmail("old@test.com");
-            existingProfile.setProfilePictureUrl("old_url");
+            existingProfile.setProfilePictureFile("old_url");
             existingUser.setProfile(existingProfile);
 
             ProfilePatchDto patchDto = new ProfilePatchDto();
@@ -745,7 +768,9 @@ class ProfileServiceTest {
             patchDto.setCity("NewCity");
             patchDto.setPhone("98765");
             patchDto.setEmail("new@test.com");
-            patchDto.setProfilePictureUrl("new_url");
+            patchDto.setProfilePictureFile(null);
+
+
             patchDto.setUsername("newUsername");
             patchDto.setPassword("newPass");
             patchDto.setRoles(Collections.singletonList("ADMIN"));
@@ -773,7 +798,7 @@ class ProfileServiceTest {
             assertEquals("NewCity", existingProfile.getCity());
             assertEquals("98765", existingProfile.getPhone());
             assertEquals("new@test.com", existingProfile.getEmail());
-            assertEquals("new_url", existingProfile.getProfilePictureUrl());
+            assertEquals("old_url", existingProfile.getProfilePictureFile());
             assertEquals("newUsername", existingUser.getUsername());
             assertEquals("encodedNewPass", existingUser.getPassword());
             assertTrue(existingUser.getRoles().contains(adminRole));
@@ -907,6 +932,35 @@ class ProfileServiceTest {
             verify(userRepository).save(existingUser);
         }
     }
+
+    @Test
+    void uploadProfilePhoto_shouldUpdateProfilePictureUrl() {
+        // Arrange
+        Long userId = 1L;
+        String newPhotoUrl = "http://example.com/new_photo.jpg";
+
+        User user = new User();
+        user.setUserId(userId);
+        Profile profile = new Profile();
+        profile.setProfilePictureFile("http://example.com/old_photo.jpg");
+        user.setProfile(profile);
+
+        MultipartFile mockFile = mock(MultipartFile.class);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(storageService.store(mockFile)).thenReturn(newPhotoUrl);
+        when(profileRepository.save(any(Profile.class))).thenReturn(profile);
+
+        // Act
+        ProfileDto result = profileService.uploadProfilePhoto(userId, mockFile);
+
+        // Assert
+        verify(userRepository, times(1)).findById(userId);
+        verify(storageService, times(1)).store(mockFile);
+        verify(profileRepository, times(1)).save(profile);
+        assertEquals(newPhotoUrl, result.profilePictureFile);
+    }
+
 
     @Test
     void deleteProfile_UserExists_DeletesUser() {

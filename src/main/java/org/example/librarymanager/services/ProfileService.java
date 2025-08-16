@@ -16,13 +16,14 @@ import org.example.librarymanager.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.security.core.GrantedAuthority;
 
 
 @Service
@@ -30,19 +31,18 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final RoleRepository roleRepository;
-    private final ProfileMapper profileMapper;
     private final PasswordEncoder passwordEncoder;
+    private final StorageService storageService;
 
-    public ProfileService(UserRepository userRepository, ProfileRepository profileRepository, RoleRepository roleRepository, ProfileMapper profileMapper, PasswordEncoder passwordEncoder) {
+    public ProfileService(UserRepository userRepository, ProfileRepository profileRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder, StorageService storageService) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.roleRepository = roleRepository;
-        this.profileMapper = profileMapper;
         this.passwordEncoder = passwordEncoder;
+        this.storageService = storageService;
     }
 
     public ProfileDto createProfile(ProfileInputDto profileInputDto) {
-
         if (userRepository.findByUsername(profileInputDto.username).isPresent()) {
             throw new UsernameAlreadyExistsException("Username " + profileInputDto.username + " already exists.");
         }
@@ -81,11 +81,10 @@ public class ProfileService {
                 profileInputDto.phone,
                 profileInputDto.email
         );
-        newUserInfo.setProfilePictureUrl(profileInputDto.profilePictureUrl);
 
         Profile savedUserInfo = profileRepository.save(newUserInfo);
 
-        return profileMapper.toResponseDto(savedUserInfo);
+        return ProfileMapper.toResponseDto(savedUserInfo);
     }
 
     public ProfileDto getProfileById(Long userId, UserDetails userDetails){
@@ -99,7 +98,7 @@ public class ProfileService {
         User profileUser = profile.getUser();
 
         if (hasPrivilegedRole || userDetails.getUsername().equals(profileUser.getUsername())) {
-            return profileMapper.toResponseDto(profile);
+            return ProfileMapper.toResponseDto(profile);
         } else {
             throw new AccessDeniedException("You do not have permission to view this profile.");
         }
@@ -107,7 +106,7 @@ public class ProfileService {
 
     public List<ProfileDto> getAllProfiles() {
         List<Profile> profiles = profileRepository.findAll();
-        return profileMapper.toResponseDtoList(profiles);
+        return ProfileMapper.toResponseDtoList(profiles);
     }
 
     public ProfileDto getProfileByUsername(String username, UserDetails userDetails) {
@@ -119,7 +118,7 @@ public class ProfileService {
             Profile profile = profileRepository.findByUser_UsernameIgnoreCase(username)
                     .orElseThrow(() -> new ResourceNotFoundException("Profile not found for username: " + username));
 
-            return profileMapper.toResponseDto(profile);
+            return ProfileMapper.toResponseDto(profile);
         } else {
             throw new AccessDeniedException("You do not have permission to view this profile.");
         }
@@ -138,7 +137,7 @@ public class ProfileService {
         if (!profile.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER"))) {
             throw new ResourceNotFoundException("User with id " + userId + " is not a member.");
         }
-        return profileMapper.toResponseDto(profile);
+        return ProfileMapper.toResponseDto(profile);
     }
 
     public ProfileDto getLibrarianById(Long userId) {
@@ -148,21 +147,21 @@ public class ProfileService {
         if (!profile.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN"))) {
             throw new ResourceNotFoundException("User with id " + userId + " is not a librarian.");
         }
-        return profileMapper.toResponseDto(profile);
+        return ProfileMapper.toResponseDto(profile);
     }
 
     public List<ProfileDto> getAllMembers() {
         List<Profile> members = profileRepository.findAll().stream()
                 .filter(ui -> ui.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_MEMBER")))
                 .collect(Collectors.toList());
-        return profileMapper.toResponseDtoList(members);
+        return ProfileMapper.toResponseDtoList(members);
     }
 
     public List<ProfileDto> getAllLibrarians() {
         List<Profile> librarians = profileRepository.findAll().stream()
                 .filter(ui -> ui.getUser().getRoles().stream().anyMatch(role -> role.getRolename().equals("ROLE_LIBRARIAN")))
                 .collect(Collectors.toList());
-        return profileMapper.toResponseDtoList(librarians);
+        return ProfileMapper.toResponseDtoList(librarians);
     }
 
     public ProfileDto updateProfile(Long userId, ProfileInputDto profileInputDto) {
@@ -175,7 +174,9 @@ public class ProfileService {
             throw new ResourceNotFoundException("User information not found for User with ID: " + userId);
         }
 
-        existingUserInfo.setFirstName(profileInputDto.firstName);
+        if (profileInputDto.getFirstName() != null) {
+            existingUserInfo.setFirstName(profileInputDto.getFirstName());
+        }
         existingUserInfo.setLastName(profileInputDto.lastName);
         existingUserInfo.setStreet(profileInputDto.street);
         existingUserInfo.setHouseNumber(profileInputDto.houseNumber);
@@ -185,9 +186,7 @@ public class ProfileService {
         if (profileInputDto.email != null) {
             existingUserInfo.setEmail(profileInputDto.email);
         }
-        if (profileInputDto.profilePictureUrl != null) {
-            existingUserInfo.setProfilePictureUrl(profileInputDto.profilePictureUrl);
-        }
+
         if (profileInputDto.phone != null) {
             existingUserInfo.setPhone(profileInputDto.phone);
         }
@@ -197,7 +196,7 @@ public class ProfileService {
                     !userRepository.findByUsername(profileInputDto.username).get().getUserId().equals(user.getUserId())) {
                 throw new UsernameAlreadyExistsException("Username " + profileInputDto.username + " already exists.");
             }
-            user.setUsername(profileInputDto.username);
+            user.setUsername(profileInputDto.getUsername());
         }
 
         if (profileInputDto.password != null && !profileInputDto.password.isEmpty()) {
@@ -215,7 +214,7 @@ public class ProfileService {
         Profile updatedUserInfo = profileRepository.save(existingUserInfo);
         userRepository.save(user);
 
-        return profileMapper.toResponseDto(updatedUserInfo);
+        return ProfileMapper.toResponseDto(updatedUserInfo);
     }
 
     public ProfileDto patchProfile(ProfilePatchDto profilePatchDto, Long userId) {
@@ -252,9 +251,6 @@ public class ProfileService {
         if (profilePatchDto.getEmail() != null) {
             existingProfile.setEmail(profilePatchDto.getEmail());
         }
-        if (profilePatchDto.getProfilePictureUrl() != null) {
-            existingProfile.setProfilePictureUrl(profilePatchDto.getProfilePictureUrl());
-        }
 
         if (profilePatchDto.getUsername() != null && !profilePatchDto.getUsername().equals(user.getUsername())) {
             if (userRepository.findByUsername(profilePatchDto.getUsername()).isPresent() &&
@@ -279,7 +275,20 @@ public class ProfileService {
         Profile patchedProfile = this.profileRepository.save(existingProfile);
         userRepository.save(user);
 
-        return profileMapper.toResponseDto(patchedProfile);
+        return ProfileMapper.toResponseDto(patchedProfile);
+    }
+
+    public ProfileDto uploadProfilePhoto(Long userId, MultipartFile file) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + userId));
+
+        Profile existingProfile = user.getProfile();
+        String newUrl = storageService.store(file);
+        existingProfile.setProfilePictureFile(newUrl);
+
+        Profile updatedProfile = this.profileRepository.save(existingProfile);
+
+        return ProfileMapper.toResponseDto(updatedProfile);
     }
 
     public void deleteProfile(Long userId) {

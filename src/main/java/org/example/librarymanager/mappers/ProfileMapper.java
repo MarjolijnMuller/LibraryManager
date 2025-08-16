@@ -1,6 +1,5 @@
 package org.example.librarymanager.mappers;
 
-
 import org.example.librarymanager.dtos.ProfileDto;
 import org.example.librarymanager.dtos.ProfileInputDto;
 import org.example.librarymanager.models.Role;
@@ -8,7 +7,6 @@ import org.example.librarymanager.models.User;
 import org.example.librarymanager.models.Profile;
 import org.example.librarymanager.repositories.RoleRepository;
 import org.springframework.stereotype.Component;
-
 
 import java.util.HashSet;
 import java.util.List;
@@ -19,13 +17,7 @@ import java.util.stream.Collectors;
 @Component
 public class ProfileMapper {
 
-    private final RoleRepository roleRepository;
-
-    public ProfileMapper(RoleRepository roleRepository){
-        this.roleRepository = roleRepository;
-    }
-
-    public Profile toEntity(ProfileInputDto profileInputDto) {
+    public static Profile toEntity(ProfileInputDto profileInputDto, String profilePictureFile, RoleRepository roleRepository) {
         User user = new User();
         user.setUsername(profileInputDto.username);
 
@@ -55,7 +47,7 @@ public class ProfileMapper {
         profile.setHouseNumber(profileInputDto.houseNumber);
         profile.setPostalCode(profileInputDto.postalCode);
         profile.setCity(profileInputDto.city);
-        profile.setProfilePictureUrl(profileInputDto.profilePictureUrl);
+        profile.setProfilePictureFile(profilePictureFile);
 
         user.setProfile(profile);
 
@@ -73,17 +65,19 @@ public class ProfileMapper {
         profileDto.houseNumber = profile.getHouseNumber();
         profileDto.postalCode = profile.getPostalCode();
         profileDto.city = profile.getCity();
-        profileDto.profilePictureUrl = profile.getProfilePictureUrl();
+        profileDto.profilePictureFile = profile.getProfilePictureFile();
 
         if (profile.getUser() != null) {
             profileDto.userId = profile.getUser().getUserId();
             profileDto.username = profile.getUser().getUsername();
         }
 
-        if (profile.getUser().getRoles() != null && !profile.getUser().getRoles().isEmpty()) {
+        if (profile.getUser() != null && profile.getUser().getRoles() != null && !profile.getUser().getRoles().isEmpty()) {
             profileDto.roles = profile.getUser().getRoles().stream()
                     .map(Role::getRolename)
                     .collect(Collectors.toList());
+        } else {
+            profileDto.roles = List.of();
         }
         return profileDto;
     }
