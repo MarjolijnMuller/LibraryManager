@@ -68,10 +68,8 @@ public class ProfileService {
         }
         newUser.setRoles(assignedRoles);
 
-        // Eerst de User opslaan om een ID te krijgen
         newUser = userRepository.save(newUser);
 
-        // Gebruik de zojuist opgeslagen User om het Profile aan te maken
         Profile newUserInfo = new Profile(
                 newUser,
                 profileInputDto.firstName,
@@ -85,26 +83,21 @@ public class ProfileService {
         );
         newUserInfo.setProfilePictureUrl(profileInputDto.profilePictureUrl);
 
-        // Nu de Profile opslaan. De ID wordt automatisch gekoppeld via de User-entiteit.
         Profile savedUserInfo = profileRepository.save(newUserInfo);
 
         return profileMapper.toResponseDto(savedUserInfo);
     }
 
     public ProfileDto getProfileById(Long userId, UserDetails userDetails){
-        // Check of de ingelogde gebruiker een bevoorrechte rol heeft
         boolean hasPrivilegedRole = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(auth -> auth.equals("ROLE_ADMIN") || auth.equals("ROLE_LIBRARIAN"));
 
-        // Zoek het profiel op basis van userId
         Profile profile = profileRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
 
-        // Haal de User-entiteit op om de gebruikersnaam te vergelijken
         User profileUser = profile.getUser();
 
-        // Check of de ingelogde gebruiker toegang heeft
         if (hasPrivilegedRole || userDetails.getUsername().equals(profileUser.getUsername())) {
             return profileMapper.toResponseDto(profile);
         } else {
@@ -139,7 +132,6 @@ public class ProfileService {
     }
 
     public ProfileDto getMemberById(Long userId) {
-        // Zoek het profiel op basis van de userId
         Profile profile = profileRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Member not found with id " + userId));
 
@@ -150,7 +142,6 @@ public class ProfileService {
     }
 
     public ProfileDto getLibrarianById(Long userId) {
-        // Zoek het profiel op basis van de userId
         Profile profile = profileRepository.findByUser_UserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Librarian not found with id " + userId));
 

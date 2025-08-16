@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    //TOTO: secret-key beveiligt opslaan
+    //TODO: secret-key beveiligt opslaan
     private final static String SECRET_KEY = "8g4kNskKFm04jI8hFjIE9E8FHe7SfuEHf9SHFuEfhuSIe8ehf";
 
     private Key getSigningKey() {
@@ -51,7 +51,7 @@ public class JwtService {
         }
         private String createToken(Map<String, Object> claims, String
                 subject) {
-            long validPeriod = 1000 * 60 * 60 * 24 * 10; // 10 days in ms
+            long validPeriod = 1000 * 60 * 60 * 2; // 2 hours in ms
             long currentTime = System.currentTimeMillis();
             return Jwts.builder()
                     .setClaims(claims)

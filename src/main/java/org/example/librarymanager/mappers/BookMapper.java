@@ -4,7 +4,6 @@ import org.example.librarymanager.dtos.BookDto;
 import org.example.librarymanager.dtos.BookInputDto;
 import org.example.librarymanager.models.Book;
 import org.example.librarymanager.models.BookCategory;
-import org.example.librarymanager.models.PaymentStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
