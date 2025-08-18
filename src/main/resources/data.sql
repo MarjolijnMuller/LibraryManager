@@ -23,17 +23,17 @@ VALUES ('ROLE_MEMBER'),
 
 INSERT INTO users (username, password)
 VALUES
-    ('admin', '$2a$10$HSkg99GUXUUlwOavURKyfu2xuPSgVRWTUolnChcD2ZROuemIqkyQS'),
-    ('emilylib', '$2a$10$lk.TulcClA9jGcVdAYaSb.7A8JFryBpPDDLo1wvgnFX/NkvHEG8I6'),
-    ('davidlib', '$2a$10$snzesRJ3cmueopRbgZleJuWWSHHShm.K3ToPe7v0y2bdjz0KSTqZC'),
-    ('sarahlib', '$2a$10$JngqkUPrtfyOCA9RjB5lz.XnQzNXLpMF8IsYK54.NNkyy.LdwYgni'),
-    ('chrislib', '$2a$10$ValRdN3RfiKzXyHIsQpPdOWCM/w4cxEx1VtQqPI.j9kmUpjdrHHiW'),
-    ('lisalib', '$2a$10$VCFDUwsI8TB0KLzyeM3/Ue3BbfU2ba/zDR95WAziMGK9cP02hf2mW'),
-    ('adamember', '$2a$10$8m8CxL1FtBwS5/xgKhJ/yuPuRlTEi5kh0ZIwl6tzYdTnH0nGSs/Xy'),
-    ('ellenmember', '$2a$10$4AMC/j78Lt5sjvgmr2rwwOMBWoEsOkgPuwC0m6xMb8I3gYC6/6XEK'),
-    ('michaelmember', '$2a$10$NJqM3e0ODFf4yb5trVjXnOA/NZFpFD4auRqCiNJWuGhbVhNJH4m.G'),
-    ('oliviamember', '$2a$10$IHxBjC5AZns1KIebWBJ7ZuNfJzMN54QDU9234mPbaGp.iJDzS3h8O'),
-    ('petermember', '$2a$10$N5P5ocYfr8zQauzczB3k5OTRrV7tpwPVL/52kQhI/GUTJJxaCPhZi');
+    ('admin', '$2a$10$4hF6r3cLqOoigiTBthkOLuBNOurQ2nRDyk0Dfb0k6MbrBtR3eO/Ba'), --passwordAdmin
+    ('emilylib', '$2a$10$j8QsYkw8Qhu0Y.MCPk4tUe.DTQC4BH8phXk0UlB.MfzX7dF5xbx3y'), --passwordEmily
+    ('davidlib', '$2a$10$SCgszi4RgN7tHgDL/VhKH.sb7bPlXwubP02/DaBguwXxSwRX.SLie'), --passwordDavid
+    ('sarahlib', '$2a$10$JQVTBgSZ5XIcOY2O6Rofp.pMIahHM8G0NiQ.WWUWpkAz85wgMSg/y'), --passwordSarah
+    ('chrislib', '$2a$10$JmV9jxQYRccXIzaXo.BljuldSznaxFJJXR9HaRDiGfD5tqicbvfGG'), --passwordChris
+    ('lisalib', '$2a$10$fKAcdt4jztFu.BmJ8dNC4umTRWnUmva444McWD8KzEbFjHkuGX9Pu'), --passwordLisa
+    ('adamember', '$2a$10$A5HVpD1XSz.zgXlnZq1y6.SY8YpEar27EKDWk6kD/oR0VJ2bneY6W'), --passwordAdam
+    ('ellenmember', '$2a$10$NUG.Cn9gO.FMfr01lY1iYuG36eUjWL5fj9UmD9ih6k4itMyKf6d.G'), --passwordEllen
+    ('michaelmember', '$2a$10$4hhYQ2C/xG.FwsjzSZpVouu6CTN/sTyzvK3Gz1aHWh5miN0RXgoAS'), --passwordMichael
+    ('oliviamember', '$2a$10$vI9PLM8AdFOgvma06LzDiORrDk2tK4oP3jQWvM0tbsH6kjoICSaKy'), --passwordOlivia
+    ('petermember', '$2a$10$8IbnYPUmcDGpXJ64AxKlTekS3tbxIaoeM2hJRSDwRUCU/jM7Y5UwK'); --passwordPeter
 
 INSERT INTO books (title, author_first_name, author_last_name, isbn, publisher, category)
 VALUES ('The Hitchhiker''s Guide to the Galaxy', 'Douglas', 'Adams', '9780345391803', 'Del Rey', 'FICTION'),
