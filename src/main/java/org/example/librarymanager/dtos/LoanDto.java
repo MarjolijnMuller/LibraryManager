@@ -11,4 +11,5 @@ public class LoanDto {
     public Long userId;
     public Long fineId;
     public LocalDate actualReturnDate;
+    public String status;
 }
