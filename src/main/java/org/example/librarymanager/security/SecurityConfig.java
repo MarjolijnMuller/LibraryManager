@@ -172,7 +172,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/loans/user").authenticated()
                         .requestMatchers(HttpMethod.GET, "/loans/user/{userId}").access(profileOwnerAuthorizationManager())
                         .requestMatchers(HttpMethod.PATCH, "/loans/{loanId}/return").access(loanOwnerAuthorizationManager())
-                        .requestMatchers(HttpMethod.GET, "/loans/{loanId}/receipt").access(loanOwnerAuthorizationManager())
+                        .requestMatchers(HttpMethod.GET, "/loans/{loanId}/pdf").access(loanOwnerAuthorizationManager())
                         .requestMatchers(HttpMethod.POST, "/loans").authenticated()
                         .requestMatchers("/loans", "/loans/**").hasAnyRole("LIBRARIAN", "ADMIN")
 
