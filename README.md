@@ -5,8 +5,10 @@ Welkom bij de LibraryManager back-end API. Deze API is gebouwd met Spring Boot e
 ### Vereisten
 
 Zorg ervoor dat de volgende software is geïnstalleerd en geconfigureerd:
-* Java Development Kit (JDK) 17 of hoger 
-* Apache Maven 
+
+* Java Development Kit (JDK) 17 of hoger
+* Apache Maven
+
 * PostgreSQL-database
 
 ### Installatie en opstarten
